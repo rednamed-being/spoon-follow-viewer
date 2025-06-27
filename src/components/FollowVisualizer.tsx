@@ -163,7 +163,7 @@ export default function FollowVisualizer({
         ? "bg-red-400"
         : "bg-teal-400";
 
-    line.className += ` h-0.5 ${color} opacity-60`;
+    line.className += ` h-1 ${color} opacity-70`;
     line.style.width = `${length}px`;
     line.style.left = `${x1}px`;
     line.style.top = `${y1}px`;
