@@ -20,10 +20,10 @@ export default function Home() {
     setFollowData(null);
 
     try {
-      // フォロワーとフォロー情報を並行して取得
+      // フォロワーとフォロー情報を並行して取得（プロキシ経由）
       const [followersResponse, followingsResponse] = await Promise.all([
-        fetch(`https://jp-api.spooncast.net/users/${userId}/followers/`),
-        fetch(`https://jp-api.spooncast.net/users/${userId}/followings/`),
+        fetch(`/api/spoon/${userId}/followers`),
+        fetch(`/api/spoon/${userId}/followings`),
       ]);
 
       if (!followersResponse.ok) {

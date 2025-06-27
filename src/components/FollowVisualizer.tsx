@@ -113,7 +113,7 @@ export default function FollowVisualizer({
     type: "follower" | "following" | "mutual"
   ) => {
     const element = document.createElement("div");
-    element.className = `absolute cursor-pointer transition-transform hover:scale-110 flex flex-col items-center gap-1`;
+    element.className = `absolute z-20 cursor-pointer transition-transform hover:scale-110 flex flex-col items-center gap-1`;
 
     const borderColor =
       type === "mutual"
@@ -163,7 +163,7 @@ export default function FollowVisualizer({
         ? "bg-red-400"
         : "bg-teal-400";
 
-    line.className += ` h-0.5 ${color} opacity-60`;
+    line.className += ` h-1 ${color} opacity-70`;
     line.style.width = `${length}px`;
     line.style.left = `${x1}px`;
     line.style.top = `${y1}px`;
