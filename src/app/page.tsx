@@ -20,11 +20,19 @@ export default function Home() {
     setFollowData(null);
 
     try {
-      // フォロワーとフォロー情報を並行して取得（プロキシ経由）
-      const [followersResponse, followingsResponse] = await Promise.all([
-        fetch(`/api/spoon/${userId}/followers`),
-        fetch(`/api/spoon/${userId}/followings`),
-      ]);
+      // ユーザー情報、フォロワー、フォロー情報を並行して取得
+      const [userResponse, followersResponse, followingsResponse] =
+        await Promise.all([
+          fetch(`/api/spoon/${userId}`),
+          fetch(`/api/spoon/${userId}/followers`),
+          fetch(`/api/spoon/${userId}/followings`),
+        ]);
+
+      if (!userResponse.ok) {
+        throw new Error(
+          `ユーザー情報の取得に失敗しました (${userResponse.status})`
+        );
+      }
 
       if (!followersResponse.ok) {
         throw new Error(
@@ -38,6 +46,7 @@ export default function Home() {
         );
       }
 
+      const userInfo = await userResponse.json();
       const followersData = await followersResponse.json();
       const followingsData = await followingsResponse.json();
 
@@ -59,13 +68,24 @@ export default function Home() {
         mutualFollows,
       });
 
-      // 中心ユーザーの情報を設定（実際のAPIでは別途取得が必要）
-      setUserData({
-        id: userId,
-        nickname: `ユーザー ${userId}`,
-        tag: `user_${userId}`,
-        profile_url: null,
-      });
+      // 実際のユーザー情報を設定
+      const targetUser = userInfo.results?.[0];
+      if (targetUser) {
+        setUserData({
+          id: targetUser.id.toString(),
+          nickname: targetUser.nickname,
+          tag: targetUser.tag,
+          profile_url: targetUser.profile_url,
+        });
+      } else {
+        // フォールバック: ユーザー情報が取得できない場合
+        setUserData({
+          id: userId,
+          nickname: `ユーザー ${userId}`,
+          tag: `user_${userId}`,
+          profile_url: null,
+        });
+      }
     } catch (err) {
       console.error("データ読み込みエラー:", err);
       setError(
