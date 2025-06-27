@@ -113,7 +113,7 @@ export default function FollowVisualizer({
     type: "follower" | "following" | "mutual"
   ) => {
     const element = document.createElement("div");
-    element.className = `absolute cursor-pointer transition-transform hover:scale-110 flex flex-col items-center gap-1`;
+    element.className = `absolute z-20 cursor-pointer transition-transform hover:scale-110 flex flex-col items-center gap-1`;
 
     const borderColor =
       type === "mutual"
