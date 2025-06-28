@@ -20,7 +20,7 @@ export default function Home() {
     setFollowData(null);
 
     try {
-      // ユーザー情報、フォロワー、フォロー情報を並行して取得
+      // ユーザー情報、フォロワー、フォロー情報を並行して取得（プロキシ経由）
       const [userResponse, followersResponse, followingsResponse] =
         await Promise.all([
           fetch(`/api/spoon/${userId}`),
@@ -50,6 +50,10 @@ export default function Home() {
       const followersData = await followersResponse.json();
       const followingsData = await followingsResponse.json();
 
+      console.log("取得したユーザーデータ:", userInfo);
+      console.log("取得したフォロワーデータ:", followersData);
+      console.log("取得したフォロー中データ:", followingsData);
+
       // 相互フォローを計算
       const followerIds = new Set(
         followersData.results?.map((f: any) => f.id) || []
@@ -68,7 +72,7 @@ export default function Home() {
         mutualFollows,
       });
 
-      // 実際のユーザー情報を設定
+      // 実際のユーザー情報を設定（resultsの最初の要素を使用）
       const targetUser = userInfo.results?.[0];
       if (targetUser) {
         setUserData({
