@@ -78,6 +78,10 @@ export async function GET(
 
         const data = await response.json();
         console.log(`[REAL API] 成功: ${strategy.name} - ユーザー情報取得完了`);
+        console.log(
+          `[REAL API] ユーザーデータ:`,
+          JSON.stringify(data, null, 2)
+        );
         return NextResponse.json(data);
       } catch (error: any) {
         console.log(`[REAL API] ${strategy.name} 失敗:`, error.message);
