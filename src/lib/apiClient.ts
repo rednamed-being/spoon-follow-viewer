@@ -1,10 +1,24 @@
 // Spoon API をクライアントサイドのみで叩くための単純なクライアント
 // GitHub Pages ではサーバーサイドコードが使えないため、必要に応じて CORS 対応のプロキシを利用する
 
+import type { SpoonApiResponse } from "@/types/spoon";
+
+interface UserInfoResponse {
+  status_code: number;
+  detail: string;
+  results: Array<{
+    id: number;
+    nickname: string;
+    tag: string;
+    profile_url: string;
+    // ...他の必要なフィールドがあれば追加
+  }>;
+}
+
 interface FetchResult {
-  userInfo: any;
-  followersData: any; // full aggregated object (first page shape + merged results)
-  followingsData: any; // same as above
+  userInfo: UserInfoResponse;
+  followersData: SpoonApiResponse;
+  followingsData: SpoonApiResponse;
 }
 
 const defaultHeaders: Record<string, string> = {
