@@ -172,10 +172,10 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
                   <div className="text-xs text-gray-500">@{u.tag}</div>
                 </td>
                 <td className="p-2 text-right tabular-nums">
-                  {u.follower_count?.toLocaleString?.()}
+                  {u.follower_count !== undefined ? u.follower_count.toLocaleString() : ""}
                 </td>
                 <td className="p-2 text-right tabular-nums">
-                  {u.following_count?.toLocaleString?.()}
+                  {u.following_count !== undefined ? u.following_count.toLocaleString() : ""}
                 </td>
                 <td className="p-2 text-xs">
                   {followData.mutualFollows.some((m) => m.id === u.id) ? (
