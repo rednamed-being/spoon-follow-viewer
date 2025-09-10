@@ -1,6 +1,6 @@
-# Spoon フォロー可視化ツール (Next.js 版)
+# Spoon フォロー可視化ツール (GitHub Pages 静的版 / Vite + React)
 
-Next.js と TypeScript を使用して構築された、Spoon アプリケーションのフォロー/フォロワー関係を可視化する Web アプリケーションです。
+GitHub Pages 上でホストできる **完全クライアントサイド** の Spoon フォロー関係可視化ツールです。Next.js 版を撤廃し、Vite + React + Tailwind CSS でゼロから再構築しました。
 
 ## 機能
 
@@ -16,11 +16,11 @@ Next.js と TypeScript を使用して構築された、Spoon アプリケーシ
 
 ## 技術スタック
 
-- **Next.js 14** - React フレームワーク
-- **TypeScript** - 型安全性
-- **Tailwind CSS** - スタイリング
-- **pnpm** - パッケージマネージャー
-- **ESLint** - コード品質
+- Vite (高速なビルド/開発環境)
+- React 18 + TypeScript
+- Tailwind CSS 3
+- ESLint
+- GitHub Actions (gh-pages デプロイ)
 
 ## セットアップ
 
@@ -36,23 +36,21 @@ Next.js と TypeScript を使用して構築された、Spoon アプリケーシ
 pnpm install
 ```
 
-### 開発サーバーの起動
+### 開発サーバー起動
 
 ```bash
 pnpm dev
 ```
 
-ブラウザで [http://localhost:3000](http://localhost:3000) を開いてアプリケーションにアクセスしてください。
+ブラウザで http://localhost:5173 を開く。
 
-### ビルドと本番環境での実行
+### ビルド
 
 ```bash
-# ビルド
 pnpm build
-
-# 本番環境で実行
-pnpm start
 ```
+
+生成物は `dist/` に出力されます。`pnpm preview` でローカル確認できます。
 
 ## 使用方法
 
@@ -69,36 +67,43 @@ pnpm start
 ## プロジェクト構造
 
 ```
-spoon_follow_viewer/
+spoon-follow-viewer/
+├── index.html
+├── vite.config.ts
 ├── src/
-│   ├── app/
-│   │   ├── globals.css        # グローバルスタイル
-│   │   ├── layout.tsx         # ルートレイアウト
-│   │   └── page.tsx           # メインページ
+│   ├── App.tsx
+│   ├── main.tsx
+│   ├── index.css
+│   ├── lib/
+│   │   └── apiClient.ts
 │   ├── components/
-│   │   ├── ErrorSection.tsx   # エラー表示コンポーネント
-│   │   ├── FollowVisualizer.tsx # メイン可視化コンポーネント
-│   │   ├── InputSection.tsx   # 入力フォームコンポーネント
-│   │   └── StatsSection.tsx   # 統計表示コンポーネント
+│   │   ├── ErrorSection.tsx
+│   │   ├── FollowVisualizer.tsx
+│   │   ├── InputSection.tsx
+│   │   └── StatsSection.tsx
 │   └── types/
-│       └── spoon.ts           # 型定義
-├── next.config.js             # Next.js設定
-├── tailwind.config.ts         # Tailwind CSS設定
-├── tsconfig.json              # TypeScript設定
-└── package.json               # 依存関係とスクリプト
+│       └── spoon.ts
+├── tailwind.config.ts
+├── postcss.config.js
+├── tsconfig.json
+└── package.json
 ```
 
-## 注意事項
+## CORS とプロキシについて
 
-- ブラウザの CORS ポリシーにより、開発環境では API アクセスに制限がある場合があります
-- 本番環境では適切な CORS 設定またはプロキシサーバーが必要です
+GitHub Pages は静的ホスティングのため、サーバーサイドでの API プロキシは使用できません。Spoon API がブラウザから直接許可されていない場合（CORS エラー）には、以下のいずれかを利用してください:
+
+1. 自前の Cloudflare Workers / Vercel Edge / Render などで CORS ヘッダーを付与する簡易プロキシを用意
+2. 一時的に CORS 解除系の公開プロキシサービス（安定性注意）を設定
+3. 事前に API レスポンスを JSON として取得し、`/public/data/*.json` に配置しモックとして読み込む（拡張余地）
+
+アプリ画面上部の「プロキシ URL」欄にプロキシのベース URL を入力すると、`GET {proxy}/{エンコード済API URL}` の形式でリクエストします。
 
 ## 開発
 
-### コードの品質チェック
+### コード品質
 
 ```bash
-# ESLint でコードをチェック
 pnpm lint
 ```
 
@@ -115,6 +120,20 @@ npx tsc --noEmit
 - `tailwind.config.ts` で色やスタイルをカスタマイズ
 - `src/components/` でコンポーネントの見た目や動作を変更
 
+## GitHub Pages デプロイ
+
+`vite.config.ts` の `base` はリポジトリ名 `/spoon-follow-viewer/` に設定済みです。GitHub Pages (Pages Source: GitHub Actions) を使用する想定で、`gh-pages` ブランチへ自動デプロイするワークフローを追加します。
+
+1. GitHub リポジトリの Settings → Pages で Build and deployment を "GitHub Actions" にする
+2. main ブランチへ push すると workflow が走り `gh-pages` ブランチが公開される
+
+手動でローカルから検証する場合:
+
+```bash
+pnpm build
+npx serve dist  # 任意の静的サーバー
+```
+
 ## ライセンス
 
-このプロジェクトは MIT ライセンスの下で公開されています。
+MIT
