@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import { UserData, FollowData, SpoonUser } from "@/types/spoon";
 
