@@ -36,6 +36,8 @@ const FollowsTable = ({ userData, followData }) => {
                 av = a.following_count;
                 bv = b.following_count;
             }
+            if (av === undefined) return 1;
+            if (bv === undefined) return -1;
             if (av < bv)
                 return sortDir === 'asc' ? -1 : 1;
             if (av > bv)
