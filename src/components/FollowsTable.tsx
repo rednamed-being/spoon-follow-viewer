@@ -32,13 +32,23 @@ const FollowsTable: React.FC<FollowsTableProps> = ({ userData, followData }) => 
     const filteredList = lower
       ? list.filter(u => (u.nickname || '').toLowerCase().includes(lower) || (u.tag||'').toLowerCase().includes(lower))
       : list;
-    const sorted = [...filteredList].sort((a,b)=>{
-      let av: any; let bv: any;
-      if (sortKey === 'nickname') { av = a.nickname?.toLowerCase(); bv = b.nickname?.toLowerCase(); }
-      else if (sortKey === 'follower_count') { av = a.follower_count; bv = b.follower_count; }
-      else { av = a.following_count; bv = b.following_count; }
-      if (av < bv) return sortDir==='asc' ? -1 : 1;
-      if (av > bv) return sortDir==='asc' ? 1 : -1;
+    const sorted = [...filteredList].sort((a, b) => {
+      let av: string | number | undefined;
+      let bv: string | number | undefined;
+      if (sortKey === 'nickname') {
+        av = a.nickname?.toLowerCase();
+        bv = b.nickname?.toLowerCase();
+      } else if (sortKey === 'follower_count') {
+        av = a.follower_count;
+        bv = b.follower_count;
+      } else {
+        av = a.following_count;
+        bv = b.following_count;
+      }
+      if (av === undefined) return 1;
+      if (bv === undefined) return -1;
+      if (av < bv) return sortDir === 'asc' ? -1 : 1;
+      if (av > bv) return sortDir === 'asc' ? 1 : -1;
       return 0;
     });
     return sorted;
