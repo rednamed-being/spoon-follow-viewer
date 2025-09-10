@@ -180,9 +180,6 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
                 <td className="p-2 text-xs">
                   {followData.mutualFollows.some((m) => m.id === u.id) ? (
                     <Badge color="blue">相互</Badge>
-                  ) : followData.followers.some((f) => f.id === u.id) &&
-                    followData.followings.some((f) => f.id === u.id) ? (
-                    <Badge color="blue">相互</Badge>
                   ) : activeTab === "followers" ? (
                     <Badge color="red">フォロワー</Badge>
                   ) : activeTab === "followings" ? (
