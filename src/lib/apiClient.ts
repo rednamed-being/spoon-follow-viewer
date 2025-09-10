@@ -1,7 +1,9 @@
+
+import type { SpoonApiResponse } from "@/types/spoon";
 // Spoon API をクライアントサイドのみで叩くための単純なクライアント
 // GitHub Pages ではサーバーサイドコードが使えないため、必要に応じて CORS 対応のプロキシを利用する
 
-import type { SpoonApiResponse } from "@/types/spoon";
+
 
 interface UserInfoResponse {
   status_code: number;
@@ -50,18 +52,20 @@ async function fetchJson(url: string, controller: AbortController) {
   return res.json();
 }
 
+
+
 async function fetchPaginated(
   firstUrl: string,
   proxyBase: string | undefined,
   controller: AbortController,
   maxPages = 10
-) {
-  let aggregated: any = null;
+): Promise<SpoonApiResponse> {
+  let aggregated: SpoonApiResponse | null = null;
   let url: string | null = firstUrl;
   let page = 0;
   while (url && page < maxPages) {
     // console.debug('Fetching page', page + 1, url);
-    const data = await fetchJson(url, controller);
+    const data: SpoonApiResponse = await fetchJson(url, controller);
     if (!aggregated) {
       aggregated = { ...data };
     } else {
@@ -74,11 +78,13 @@ async function fetchPaginated(
     url = buildNextUrl(proxyBase, data.next || null);
     page += 1;
   }
-  if (url) {
-    aggregated._truncated = true; // まだ続きがあるが maxPages で打ち切り
+  if (aggregated && url) {
+    (aggregated as any)._truncated = true; // まだ続きがあるが maxPages で打ち切り
   }
-  aggregated._pagesFetched = page;
-  return aggregated;
+  if (aggregated) {
+    (aggregated as any)._pagesFetched = page;
+  }
+  return aggregated!;
 }
 
 export async function fetchAll(
