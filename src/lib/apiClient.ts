@@ -1,3 +1,10 @@
+// Vite環境用: import.meta.env型定義
+interface ImportMeta {
+  readonly env: {
+    DEV: boolean;
+    [key: string]: any;
+  };
+}
 
 import type { SpoonApiResponse } from "@/types/spoon";
 // Spoon API をクライアントサイドのみで叩くための単純なクライアント
@@ -53,7 +60,15 @@ async function fetchJson(url: string, controller: AbortController) {
 }
 
 
-
+/**
+ * Fetches paginated Spoon API results, aggregating all pages up to maxPages.
+ *
+ * @param firstUrl - The initial API endpoint to fetch.
+ * @param proxyBase - Optional CORS proxy base URL. If provided, all requests are routed through this proxy.
+ * @param controller - AbortController for request cancellation and timeout.
+ * @param maxPages - Maximum number of pages to fetch. If the API has more pages, results are truncated and a `_truncated` flag is set.
+ * @returns Aggregated SpoonApiResponse containing all results up to maxPages. Adds `_truncated` and `_pagesFetched` properties for diagnostics.
+ */
 async function fetchPaginated(
   firstUrl: string,
   proxyBase: string | undefined,
@@ -114,10 +129,7 @@ export async function fetchAll(
     ]);
     return { userInfo, followersData, followingsData };
   } catch (e) {
-    if (
-      typeof process !== "undefined" &&
-      process.env.NODE_ENV === "development"
-    ) {
+    if (import.meta.env && import.meta.env.DEV) {
       // 開発環境のみエラー詳細を出力
       // eslint-disable-next-line no-console
       console.error("API fetch error", e);
