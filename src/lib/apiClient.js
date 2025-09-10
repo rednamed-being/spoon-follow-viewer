@@ -61,7 +61,10 @@ export async function fetchAll(userId, proxyBase) {
         return { userInfo, followersData, followingsData };
     }
     catch (e) {
-        console.error('API fetch error', e);
+        if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error('API fetch error', e);
+        }
         throw e;
     }
     finally {
