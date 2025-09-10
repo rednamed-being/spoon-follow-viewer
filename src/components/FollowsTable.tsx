@@ -59,6 +59,10 @@ const FollowsTable: React.FC<FollowsTableProps> = ({ userData, followData }) => 
     else { setSortKey(key); setSortDir('asc'); }
   };
 
+  const handleImgError = React.useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.src = getDefaultAvatar();
+  }, []);
+
   return (
     <div className="bg-white rounded-2xl shadow-2xl p-6">
       <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
@@ -104,7 +108,12 @@ const FollowsTable: React.FC<FollowsTableProps> = ({ userData, followData }) => 
             {filtered.map(u => (
               <tr key={u.id} className="border-t hover:bg-purple-50/50">
                 <td className="p-2">
-                  <img src={u.profile_url || getDefaultAvatar()} onError={(e)=>{(e.target as HTMLImageElement).src=getDefaultAvatar();}} alt={u.nickname} className="w-10 h-10 rounded-full object-cover border" />
+                  <img
+                    src={u.profile_url || getDefaultAvatar()}
+                    onError={handleImgError}
+                    alt={u.nickname}
+                    className="w-10 h-10 rounded-full object-cover border"
+                  />
                 </td>
                 <td className="p-2">
                   <div className="font-medium text-gray-800 truncate max-w-[180px]" title={u.nickname}>{u.nickname}</div>
