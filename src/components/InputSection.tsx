@@ -9,7 +9,7 @@ export default function InputSection({
   onLoadData,
   loading,
 }: InputSectionProps) {
-  const [userId, setUserId] = useState("316704114");
+  const [userId, setUserId] = useState("0");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
