@@ -116,14 +116,15 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
         </div>
       </div>
       <div className="overflow-auto border rounded-xl">
-        <table className="min-w-full text-sm">
+  <table className="min-w-full table-fixed text-sm">
           <thead className="bg-gray-50">
             <tr>
-              <Th>アイコン</Th>
+              <Th className="w-12">アイコン</Th>
               <SortableTh
                 active={sortKey === "nickname"}
                 dir={sortDir}
                 onClick={() => handleSort("nickname")}
+                className="w-32"
               >
                 ユーザー
               </SortableTh>
@@ -131,6 +132,7 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
                 active={sortKey === "follower_count"}
                 dir={sortDir}
                 onClick={() => handleSort("follower_count")}
+                className="w-20"
               >
                 フォロワー数
               </SortableTh>
@@ -138,10 +140,11 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
                 active={sortKey === "following_count"}
                 dir={sortDir}
                 onClick={() => handleSort("following_count")}
+                className="w-20"
               >
                 フォロー数
               </SortableTh>
-              <Th>種別</Th>
+              <Th className="w-16">種別</Th>
             </tr>
           </thead>
           <tbody>
@@ -172,10 +175,14 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
                   <div className="text-xs text-gray-500">@{u.tag}</div>
                 </td>
                 <td className="p-2 text-right tabular-nums">
-                  {u.follower_count !== undefined ? u.follower_count.toLocaleString() : ""}
+                  {u.follower_count !== undefined
+                    ? u.follower_count.toLocaleString()
+                    : ""}
                 </td>
                 <td className="p-2 text-right tabular-nums">
-                  {u.following_count !== undefined ? u.following_count.toLocaleString() : ""}
+                  {u.following_count !== undefined
+                    ? u.following_count.toLocaleString()
+                    : ""}
                 </td>
                 <td className="p-2 text-xs">
                   {followData.mutualFollows.some((m) => m.id === u.id) ? (
@@ -203,8 +210,8 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
   );
 };
 
-const Th: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <th className="px-3 py-2 text-left text-[11px] font-semibold tracking-wider text-gray-500 uppercase select-none">
+const Th: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = "" }) => (
+  <th className={`px-3 py-2 text-left text-[11px] font-semibold tracking-wider text-gray-500 uppercase select-none ${className}`}>
     {children}
   </th>
 );
@@ -214,12 +221,13 @@ const SortableTh: React.FC<{
   active: boolean;
   dir: "asc" | "desc";
   onClick: () => void;
-}> = ({ children, active, dir, onClick }) => (
+  className?: string;
+}> = ({ children, active, dir, onClick, className = "" }) => (
   <th
     onClick={onClick}
     className={`px-3 py-2 text-left text-[11px] font-semibold tracking-wider uppercase cursor-pointer select-none group ${
       active ? "text-purple-600" : "text-gray-500 hover:text-gray-700"
-    }`}
+    } ${className}`}
   >
     <span className="inline-flex items-center gap-1">
       {children}
