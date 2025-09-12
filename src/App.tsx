@@ -96,11 +96,13 @@ export default function App() {
         {error && <ErrorSection message={error} />}
         {followData && userData && (
           <>
-            <StatsSection
-              followerCount={followData.followers.length}
-              followingCount={followData.followings.length}
-              mutualCount={followData.mutualFollows.length}
-            />
+            <div className="px-2">
+              <StatsSection
+                followerCount={followData.followers.length}
+                followingCount={followData.followings.length}
+                mutualCount={followData.mutualFollows.length}
+              />
+            </div>
             <FollowsTable userData={userData} followData={followData} />
           </>
         )}
