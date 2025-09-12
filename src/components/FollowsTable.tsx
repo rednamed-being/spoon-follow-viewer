@@ -11,7 +11,7 @@ const tabLabels: Record<TabKey, string> = {
 function FollowsTable({ userData, followData }: { userData: UserData; followData: FollowData }) {
   const [activeTab, setActiveTab] = useState<TabKey>("mutual");
   const [query, setQuery] = useState("");
-  const [sortKey, setSortKey] = useState<"nickname" | "follower_count" | "following_count">("nickname");
+  const [sortKey, setSortKey] = useState<"order" | "nickname" | "follower_count" | "following_count">("order");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const dataMap: Record<TabKey, SpoonUser[]> = useMemo(
@@ -33,6 +33,10 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
             (u.tag || "").toLowerCase().includes(lower)
         )
       : list;
+    if (sortKey === "order") {
+      // 取得順（登録順）はAPI配列順そのまま
+      return sortDir === "asc" ? filteredList : [...filteredList].reverse();
+    }
     const sorted = [...filteredList].sort((a, b) => {
       let av: string | number | undefined;
       let bv: string | number | undefined;
@@ -91,11 +95,34 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
           ))}
         </div>
         <div className="flex-1" />
-        <div className="flex flex-col items-end gap-1 min-w-[160px]">
+        <div className="flex flex-col items-end gap-1 min-w-[200px]">
           <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
             <TypeIcon type="mutual" /> 相互
             <TypeIcon type="follower" /> フォロワー
             <TypeIcon type="following" /> フォロー中
+          </div>
+          <div className="flex gap-2 w-full mb-1">
+            <label className="text-xs text-gray-500 flex items-center gap-1">
+              ソート:
+              <select
+                className="border rounded px-1 py-0.5 text-xs"
+                value={sortKey}
+                onChange={e => setSortKey(e.target.value as any)}
+              >
+                <option value="order">登録順</option>
+                <option value="nickname">名前順</option>
+                <option value="follower_count">フォロワー数順</option>
+                <option value="following_count">フォロー数順</option>
+              </select>
+              <button
+                type="button"
+                className="ml-1 text-gray-400 hover:text-gray-700"
+                title="昇順/降順切替"
+                onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")}
+              >
+                {sortDir === "asc" ? "▲" : "▼"}
+              </button>
+            </label>
           </div>
           <div className="relative max-w-xs w-full">
             <input
@@ -111,15 +138,15 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
         </div>
       </div>
       <div className="overflow-y-auto border rounded-xl max-h-[60vh]">
-        <table className="min-w-full table-fixed text-sm">
-          <thead className="bg-gray-50">
+  <table className="min-w-full table-fixed text-sm" style={{ tableLayout: 'fixed' }}>
+          <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
-              <Th className="w-12">アイコン</Th>
+              <Th className="w-14 min-w-[56px] max-w-[56px]">アイコン</Th>
               <SortableTh
                 active={sortKey === "nickname"}
                 dir={sortDir}
                 onClick={() => handleSort("nickname")}
-                className="w-32"
+                className="w-40 min-w-[120px] max-w-[200px]"
               >
                 ユーザー
               </SortableTh>
@@ -127,7 +154,7 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
                 active={sortKey === "follower_count"}
                 dir={sortDir}
                 onClick={() => handleSort("follower_count")}
-                className="w-20"
+                className="w-24 min-w-[80px] max-w-[100px] text-right"
               >
                 フォロワー数
               </SortableTh>
@@ -135,11 +162,11 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
                 active={sortKey === "following_count"}
                 dir={sortDir}
                 onClick={() => handleSort("following_count")}
-                className="w-20"
+                className="w-24 min-w-[80px] max-w-[100px] text-right"
               >
                 フォロー数
               </SortableTh>
-              <Th className="w-16">種別</Th>
+              <Th className="w-16 min-w-[64px] max-w-[64px]">種別</Th>
             </tr>
           </thead>
           <tbody>
