@@ -10,8 +10,6 @@ import type { SpoonApiResponse } from "@/types/spoon";
 // Spoon API をクライアントサイドのみで叩くための単純なクライアント
 // GitHub Pages ではサーバーサイドコードが使えないため、必要に応じて CORS 対応のプロキシを利用する
 
-
-
 interface UserInfoResponse {
   status_code: number;
   detail: string;
@@ -59,7 +57,6 @@ async function fetchJson(url: string, controller: AbortController) {
   return res.json();
 }
 
-
 /**
  * Fetches paginated Spoon API results, aggregating all pages up to maxPages.
  *
@@ -73,12 +70,12 @@ async function fetchPaginated(
   firstUrl: string,
   proxyBase: string | undefined,
   controller: AbortController,
-  maxPages = 10
 ): Promise<SpoonApiResponse> {
   let aggregated: SpoonApiResponse | null = null;
   let url: string | null = firstUrl;
   let page = 0;
-  while (url && page < maxPages) {
+  let prevNext: string | null = null;
+  while (url) {
     // console.debug('Fetching page', page + 1, url);
     const data: SpoonApiResponse = await fetchJson(url, controller);
     if (!aggregated) {
@@ -90,12 +87,16 @@ async function fetchPaginated(
       ];
     }
     // 次ページ URL 再構築
-    url = buildNextUrl(proxyBase, data.next || null);
+    const nextUrl = buildNextUrl(proxyBase, data.next || null);
+    if (nextUrl && nextUrl === prevNext) {
+      // nextが同じ値になったら取得停止
+      break;
+    }
+    prevNext = nextUrl;
+    url = nextUrl;
     page += 1;
   }
-  if (aggregated && url) {
-    (aggregated as any)._truncated = true; // まだ続きがあるが maxPages で打ち切り
-  }
+  // maxPagesによる_truncatedは不要
   if (aggregated) {
     (aggregated as any)._pagesFetched = page;
   }
@@ -124,8 +125,8 @@ export async function fetchAll(
   try {
     const userInfo = await fetchJson(userUrl, controller);
     const [followersData, followingsData] = await Promise.all([
-      fetchPaginated(followersFirst, proxyBase, controller, 20), // 最大20ページ(約600件想定)
-      fetchPaginated(followingsFirst, proxyBase, controller, 20),
+      fetchPaginated(followersFirst, proxyBase, controller),
+      fetchPaginated(followingsFirst, proxyBase, controller),
     ]);
     return { userInfo, followersData, followingsData };
   } catch (e) {

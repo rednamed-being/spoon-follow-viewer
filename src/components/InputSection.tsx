@@ -29,7 +29,11 @@ export default function InputSection({
             htmlFor="userId"
             className="block text-sm font-semibold text-gray-700 mb-2"
           >
-            ユーザーID <span className="text-xs text-gray-500">（プロフィールURLの末尾の数字）</span>:
+            ユーザーID{" "}
+            <span className="text-xs text-gray-500">
+              （プロフィールURLの末尾の数字）
+            </span>
+            :
           </label>
           <input
             type="text"
