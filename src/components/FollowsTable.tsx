@@ -103,7 +103,13 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
           ))}
         </div>
         <div className="flex-1" />
-        <div className="relative max-w-xs w-full">
+        <div className="flex flex-col items-end gap-1 min-w-[160px]">
+          <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+            <TypeIcon type="mutual" /> 相互
+            <TypeIcon type="follower" /> フォロワー
+            <TypeIcon type="following" /> フォロー中
+          </div>
+          <div className="relative max-w-xs w-full">
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -113,10 +119,11 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400">
             🔍
           </span>
+          </div>
         </div>
       </div>
       <div className="overflow-auto border rounded-xl">
-  <table className="min-w-full table-fixed text-sm">
+        <table className="min-w-full table-fixed text-sm">
           <thead className="bg-gray-50">
             <tr>
               <Th className="w-12">アイコン</Th>
@@ -184,15 +191,15 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
                     ? u.following_count.toLocaleString()
                     : ""}
                 </td>
-                <td className="p-2 text-xs">
+                <td className="p-2 text-xs text-center">
                   {followData.mutualFollows.some((m) => m.id === u.id) ? (
-                    <Badge color="blue">相互</Badge>
+                    <TypeIcon type="mutual" />
                   ) : activeTab === "followers" ? (
-                    <Badge color="red">フォロワー</Badge>
+                    <TypeIcon type="follower" />
                   ) : activeTab === "followings" ? (
-                    <Badge color="teal">フォロー中</Badge>
+                    <TypeIcon type="following" />
                   ) : (
-                    <Badge color="gray">-</Badge>
+                    <TypeIcon type="none" />
                   )}
                 </td>
               </tr>
@@ -200,18 +207,38 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
           </tbody>
         </table>
       </div>
-      <div className="text-xs text-gray-500 mt-3 flex flex-wrap gap-4">
+      <div className="text-xs text-gray-500 mt-3 flex flex-wrap gap-4 items-center">
         <div>表示件数: {filtered.length}</div>
         <div>総フォロワー: {followData.followers.length}</div>
         <div>総フォロー: {followData.followings.length}</div>
         <div>相互: {followData.mutualFollows.length}</div>
       </div>
+
+// 種別アイコン
+function TypeIcon({ type }: { type: "mutual" | "follower" | "following" | "none" }) {
+  const colorMap: Record<string, string> = {
+    mutual: "#3b82f6", // blue-500
+    follower: "#ef4444", // red-500
+    following: "#14b8a6", // teal-500
+    none: "#d1d5db", // gray-300
+  };
+  return (
+    <svg width="16" height="16" className="inline-block align-middle" aria-label={type}>
+      <circle cx="8" cy="8" r="7" fill={colorMap[type]} stroke="#fff" strokeWidth="2" />
+    </svg>
+  );
+}
     </div>
   );
 };
 
-const Th: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = "" }) => (
-  <th className={`px-3 py-2 text-left text-[11px] font-semibold tracking-wider text-gray-500 uppercase select-none ${className}`}>
+const Th: React.FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className = "",
+}) => (
+  <th
+    className={`px-3 py-2 text-left text-[11px] font-semibold tracking-wider text-gray-500 uppercase select-none ${className}`}
+  >
     {children}
   </th>
 );
