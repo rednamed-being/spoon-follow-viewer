@@ -154,7 +154,7 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
                 active={sortKey === "follower_count"}
                 dir={sortDir}
                 onClick={() => handleSort("follower_count")}
-                className="w-16 min-w-[56px] max-w-[80px] text-right"
+                className="w-24 min-w-[72px] max-w-[110px] text-right"
               >
                 フォロワー数
               </SortableTh>
@@ -162,7 +162,7 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
                 active={sortKey === "following_count"}
                 dir={sortDir}
                 onClick={() => handleSort("following_count")}
-                className="w-16 min-w-[56px] max-w-[80px] text-right"
+                className="w-24 min-w-[72px] max-w-[110px] text-right"
               >
                 フォロー数
               </SortableTh>
@@ -196,12 +196,12 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
                   </div>
                   <div className="text-xs text-gray-500">@{u.tag}</div>
                 </td>
-                <td className="p-1 text-right tabular-nums">
+                <td className="p-1 text-right tabular-nums whitespace-nowrap overflow-x-auto">
                   {u.follower_count !== undefined
                     ? u.follower_count.toLocaleString()
                     : ""}
                 </td>
-                <td className="p-1 text-right tabular-nums">
+                <td className="p-1 text-right tabular-nums whitespace-nowrap overflow-x-auto">
                   {u.following_count !== undefined
                     ? u.following_count.toLocaleString()
                     : ""}
