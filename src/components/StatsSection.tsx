@@ -10,8 +10,8 @@ export default function StatsSection({
   mutualCount,
 }: StatsSectionProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div className="bg-white rounded-2xl shadow-xl p-6 text-center hover:transform hover:-translate-y-2 transition-transform duration-300">
+    <div className="flex flex-col sm:flex-row gap-6 mb-8">
+      <div className="flex-1 bg-white rounded-2xl shadow-xl p-6 text-center hover:transform hover:-translate-y-2 transition-transform duration-300">
         <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">
           フォロワー数
         </h3>
@@ -20,7 +20,7 @@ export default function StatsSection({
         </span>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-xl p-6 text-center hover:transform hover:-translate-y-2 transition-transform duration-300">
+      <div className="flex-1 bg-white rounded-2xl shadow-xl p-6 text-center hover:transform hover:-translate-y-2 transition-transform duration-300">
         <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">
           フォロー数
         </h3>
@@ -29,7 +29,7 @@ export default function StatsSection({
         </span>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-xl p-6 text-center hover:transform hover:-translate-y-2 transition-transform duration-300">
+      <div className="flex-1 bg-white rounded-2xl shadow-xl p-6 text-center hover:transform hover:-translate-y-2 transition-transform duration-300">
         <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">
           相互フォロー
         </h3>
