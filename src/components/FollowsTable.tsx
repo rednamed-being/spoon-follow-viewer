@@ -138,15 +138,15 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
         </div>
       </div>
       <div className="overflow-y-auto border rounded-xl max-h-[60vh]">
-  <table className="min-w-full table-fixed text-sm" style={{ tableLayout: 'fixed' }}>
+  <table className="min-w-full table-fixed text-xs" style={{ tableLayout: 'fixed' }}>
           <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
-              <Th className="w-14 min-w-[56px] max-w-[56px]">アイコン</Th>
+              <Th className="w-10 min-w-[40px] max-w-[40px]">アイコン</Th>
               <SortableTh
                 active={sortKey === "nickname"}
                 dir={sortDir}
                 onClick={() => handleSort("nickname")}
-                className="w-40 min-w-[120px] max-w-[200px]"
+                className="w-32 min-w-[80px] max-w-[120px]"
               >
                 ユーザー
               </SortableTh>
@@ -154,7 +154,7 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
                 active={sortKey === "follower_count"}
                 dir={sortDir}
                 onClick={() => handleSort("follower_count")}
-                className="w-24 min-w-[80px] max-w-[100px] text-right"
+                className="w-16 min-w-[56px] max-w-[80px] text-right"
               >
                 フォロワー数
               </SortableTh>
@@ -162,11 +162,11 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
                 active={sortKey === "following_count"}
                 dir={sortDir}
                 onClick={() => handleSort("following_count")}
-                className="w-24 min-w-[80px] max-w-[100px] text-right"
+                className="w-16 min-w-[56px] max-w-[80px] text-right"
               >
                 フォロー数
               </SortableTh>
-              <Th className="w-16 min-w-[64px] max-w-[64px]">種別</Th>
+              <Th className="w-12 min-w-[40px] max-w-[48px]">種別</Th>
             </tr>
           </thead>
           <tbody>
@@ -179,7 +179,7 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
             )}
             {filtered.map((u) => (
               <tr key={u.id} className="border-t hover:bg-purple-50/50">
-                <td className="p-2">
+                <td className="p-1">
                   <img
                     src={u.profile_url || getDefaultAvatar()}
                     onError={handleImgError}
@@ -187,7 +187,7 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
                     className="w-10 h-10 rounded-full object-cover border"
                   />
                 </td>
-                <td className="p-2">
+                <td className="p-1">
                   <div
                     className="font-medium text-gray-800 truncate max-w-[180px]"
                     title={u.nickname}
@@ -196,17 +196,17 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
                   </div>
                   <div className="text-xs text-gray-500">@{u.tag}</div>
                 </td>
-                <td className="p-2 text-right tabular-nums">
+                <td className="p-1 text-right tabular-nums">
                   {u.follower_count !== undefined
                     ? u.follower_count.toLocaleString()
                     : ""}
                 </td>
-                <td className="p-2 text-right tabular-nums">
+                <td className="p-1 text-right tabular-nums">
                   {u.following_count !== undefined
                     ? u.following_count.toLocaleString()
                     : ""}
                 </td>
-                <td className="p-2 text-xs text-center">
+                <td className="p-1 text-xs text-center">
                   {followData.mutualFollows.some((m) => m.id === u.id) ? (
                     <TypeIcon type="mutual" />
                   ) : activeTab === "followers" ? (
