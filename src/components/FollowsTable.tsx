@@ -1,48 +1,20 @@
 import React, { useMemo, useState } from "react";
 import { FollowData, SpoonUser, UserData } from "@/types/spoon";
 
-interface FollowsTableProps {
-  userData: UserData;
-  followData: FollowData;
-}
+// テーブルヘッダー
+const Th: React.FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className = "",
+}) => (
+  <th
+    className={`px-3 py-2 text-left text-[11px] font-semibold tracking-wider text-gray-500 uppercase select-none ${className}`}
+  >
+    {children}
+  </th>
+);
 
-type TabKey = "mutual" | "followers" | "followings";
-
-const tabLabels: Record<TabKey, string> = {
-  mutual: "相互フォロー",
-  followers: "フォロワー",
-  followings: "フォロー中",
-};
-
-const FollowsTable: React.FC<FollowsTableProps> = ({
-  userData,
-  followData,
-}) => {
-  const [activeTab, setActiveTab] = useState<TabKey>("mutual");
-  const [query, setQuery] = useState("");
-  const [sortKey, setSortKey] = useState<
-    "nickname" | "follower_count" | "following_count"
-  >("nickname");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
-
-  const dataMap: Record<TabKey, SpoonUser[]> = useMemo(
-    () => ({
-      mutual: followData.mutualFollows,
-      followers: followData.followers,
-      followings: followData.followings,
-    }),
-    [followData]
-  );
-
-  const filtered = useMemo(() => {
-    const list = dataMap[activeTab] || [];
-    const lower = query.toLowerCase();
-    const filteredList = lower
-      ? list.filter(
-          (u) =>
-            (u.nickname || "").toLowerCase().includes(lower) ||
-            (u.tag || "").toLowerCase().includes(lower)
-        )
+// 並び替え可能なヘッダー
+const SortableTh: React.FC<{
       : list;
     const sorted = [...filteredList].sort((a, b) => {
       let av: string | number | undefined;
@@ -122,7 +94,7 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
           </div>
         </div>
       </div>
-      <div className="overflow-auto border rounded-xl">
+      <div className="overflow-y-auto border rounded-xl max-h-[60vh]">
         <table className="min-w-full table-fixed text-sm">
           <thead className="bg-gray-50">
             <tr>
@@ -213,62 +185,9 @@ const FollowsTable: React.FC<FollowsTableProps> = ({
         <div>総フォロー: {followData.followings.length}</div>
         <div>相互: {followData.mutualFollows.length}</div>
       </div>
-
-// 種別アイコン
-function TypeIcon({ type }: { type: "mutual" | "follower" | "following" | "none" }) {
-  const colorMap: Record<string, string> = {
-    mutual: "#3b82f6", // blue-500
-    follower: "#ef4444", // red-500
-    following: "#14b8a6", // teal-500
-    none: "#d1d5db", // gray-300
-  };
-  return (
-    <svg width="16" height="16" className="inline-block align-middle" aria-label={type}>
-      <circle cx="8" cy="8" r="7" fill={colorMap[type]} stroke="#fff" strokeWidth="2" />
-    </svg>
-  );
-}
     </div>
-  );
-};
 
-const Th: React.FC<{ children: React.ReactNode; className?: string }> = ({
-  children,
-  className = "",
-}) => (
-  <th
-    className={`px-3 py-2 text-left text-[11px] font-semibold tracking-wider text-gray-500 uppercase select-none ${className}`}
-  >
-    {children}
-  </th>
-);
-
-const SortableTh: React.FC<{
-  children: React.ReactNode;
-  active: boolean;
-  dir: "asc" | "desc";
-  onClick: () => void;
-  className?: string;
-}> = ({ children, active, dir, onClick, className = "" }) => (
-  <th
-    onClick={onClick}
-    className={`px-3 py-2 text-left text-[11px] font-semibold tracking-wider uppercase cursor-pointer select-none group ${
-      active ? "text-purple-600" : "text-gray-500 hover:text-gray-700"
-    } ${className}`}
-  >
-    <span className="inline-flex items-center gap-1">
-      {children}
-      <span className="text-[9px] opacity-70 group-hover:opacity-100">
-        {active ? (dir === "asc" ? "▲" : "▼") : "⇅"}
-      </span>
-    </span>
-  </th>
-);
-
-const Badge: React.FC<{
-  children: React.ReactNode;
-  color?: "red" | "teal" | "blue" | "gray";
-}> = ({ children, color = "gray" }) => {
+// Badge, getDefaultAvatar, TypeIcon 定義はこの下に続く
   const colorMap: Record<string, string> = {
     red: "bg-red-100 text-red-600 border-red-200",
     teal: "bg-teal-100 text-teal-600 border-teal-200",
@@ -287,8 +206,7 @@ const Badge: React.FC<{
 const DEFAULT_AVATAR_BASE64 =
   "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNlMWUxZTEiLz48cGF0aCBkPSJNMjAgMThjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCAxLjc5LTQgNCAxLjc5IDQgNCA0em0wIDJjLTIuNjcgMC04IDEuMzQtOCA0djJoMTZ2LTJjMC0yLjY2LTUuMzMtNC04LTR6IiBmaWxsPSIjYmZiZmJmIi8+PC9zdmc+";
 
+
 function getDefaultAvatar() {
   return DEFAULT_AVATAR_BASE64;
 }
-
-export default React.memo(FollowsTable);
