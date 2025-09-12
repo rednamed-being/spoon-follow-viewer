@@ -68,11 +68,8 @@ export default function App() {
       <div className="container mx-auto px-4 py-8">
         <header className="text-center text-white mb-8">
           <h1 className="text-4xl font-bold mb-4 drop-shadow-lg">
-            🍜 Spoon フォロー可視化ツール (Static)
+            Spoonフォロー可視化ツール
           </h1>
-          <p className="text-xl opacity-90">
-            GitHub Pages でホストされた静的版
-          </p>
         </header>
 
         <div className="bg-white rounded-2xl shadow-2xl p-6 mb-6 flex flex-col gap-4">

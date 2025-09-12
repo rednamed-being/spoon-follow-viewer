@@ -9,7 +9,7 @@ export default function InputSection({
   onLoadData,
   loading,
 }: InputSectionProps) {
-  const [userId, setUserId] = useState("0");
+  const [userId, setUserId] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,14 +29,14 @@ export default function InputSection({
             htmlFor="userId"
             className="block text-sm font-semibold text-gray-700 mb-2"
           >
-            ユーザーID:
+            ユーザーID <span className="text-xs text-gray-500">（プロフィールURLの末尾の数字）</span>:
           </label>
           <input
             type="text"
             id="userId"
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
-            placeholder="例: 316704114"
+            placeholder="例: 1234567890"
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
             disabled={loading}
           />
