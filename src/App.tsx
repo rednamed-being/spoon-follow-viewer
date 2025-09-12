@@ -72,24 +72,28 @@ export default function App() {
           </h1>
         </header>
 
-        <div className="bg-white rounded-2xl shadow-2xl p-6 mb-6 flex flex-col gap-4">
-          <label
-            className="text-sm font-semibold text-gray-700"
-            htmlFor="proxy"
-          >
-            オプション: プロキシURL (CORS回避用)
-          </label>
-          <input
-            id="proxy"
-            placeholder="例: https://your-proxy.example.com"
-            value={proxy}
-            onChange={(e) => setProxy(e.target.value)}
-            className="px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-          <p className="text-xs text-gray-500">
-            Spoon API が CORS でブロックされる場合は、任意の CORS
-            解除プロキシを設定してください。
-          </p>
+
+        {/* プロキシURL入力欄（Collapse/Accordionで一番下に移動） */}
+        <div className="fixed bottom-0 left-0 w-full flex justify-center pointer-events-none z-40">
+          <div className="w-full max-w-md mx-auto mb-4 pointer-events-auto">
+            <details className="bg-white rounded-xl shadow-lg px-4 py-3">
+              <summary className="cursor-pointer text-sm font-semibold text-gray-700 select-none">
+                オプション: プロキシURL (CORS回避用)
+              </summary>
+              <div className="mt-2 flex flex-col gap-2">
+                <input
+                  id="proxy"
+                  placeholder="例: https://your-proxy.example.com"
+                  value={proxy}
+                  onChange={(e) => setProxy(e.target.value)}
+                  className="px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <p className="text-xs text-gray-500">
+                  Spoon API が CORS でブロックされる場合は、任意の CORS解除プロキシを設定してください。
+                </p>
+              </div>
+            </details>
+          </div>
         </div>
 
         <InputSection onLoadData={handleLoadData} loading={loading} />
