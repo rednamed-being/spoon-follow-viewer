@@ -189,12 +189,17 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
                 </td>
                 <td className="p-1">
                   <div
-                    className="font-medium text-gray-800 truncate max-w-[180px]"
+                    className="font-medium text-gray-800 truncate max-w-[110px] md:max-w-[160px] lg:max-w-[180px] whitespace-nowrap"
                     title={u.nickname}
                   >
                     {u.nickname}
                   </div>
-                  <div className="text-xs text-gray-500">@{u.tag}</div>
+                  <div
+                    className="text-xs text-gray-500 truncate max-w-[90px] md:max-w-[120px] lg:max-w-[140px] whitespace-nowrap"
+                    title={u.tag}
+                  >
+                    @{u.tag}
+                  </div>
                 </td>
                 <td className="p-1 text-right tabular-nums whitespace-nowrap overflow-x-auto">
                   {u.follower_count !== undefined
