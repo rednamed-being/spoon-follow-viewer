@@ -94,13 +94,23 @@ export default function App() {
                   imgUrl: ch.recentLiveCasts[0].imgUrl,
                 }
               : null;
-            // 直近予定
-            const nextSchedule = ch?.schedules?.[0]
-              ? {
-                  scheduleDate: ch.schedules[0].scheduleDate,
-                  title: ch.schedules[0].title,
-                }
-              : null;
+            // 直近未来の配信予定のみ抽出
+            let nextSchedule = null;
+            if (Array.isArray(ch?.schedules)) {
+              const now = new Date();
+              const futureSchedules = ch.schedules
+                .filter((s: any) => {
+                  const d = new Date(s.scheduleDate);
+                  return d > now && d.getFullYear() < 2100; // 9000年などダミー除外
+                })
+                .sort((a: any, b: any) => new Date(a.scheduleDate).getTime() - new Date(b.scheduleDate).getTime());
+              if (futureSchedules.length > 0) {
+                nextSchedule = {
+                  scheduleDate: futureSchedules[0].scheduleDate,
+                  title: futureSchedules[0].title,
+                };
+              }
+            }
             setChannelInfo({
               currentLiveId: ch.currentLiveId ?? null,
               recentLive,
