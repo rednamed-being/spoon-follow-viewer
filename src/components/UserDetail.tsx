@@ -1,6 +1,15 @@
 import { SpoonUser } from "@/types/spoon";
 
-export default function UserDetail({ user }: { user: SpoonUser }) {
+type ChannelInfo = {
+  currentLiveId: number | null;
+  recentLive: { created: string; title: string; imgUrl?: string } | null;
+  nextSchedule: { scheduleDate: string; title: string } | null;
+};
+
+export default function UserDetail({ user, channelInfo }: { user: SpoonUser, channelInfo?: ChannelInfo | null }) {
+  const liveUrl = channelInfo?.currentLiveId
+    ? `https://www.spooncast.net/jp/live/${channelInfo.currentLiveId}`
+    : null;
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 flex flex-col md:flex-row items-center gap-6">
       <img
@@ -18,14 +27,36 @@ export default function UserDetail({ user }: { user: SpoonUser }) {
           {user.is_vip && (
             <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">VIP</span>
           )}
+          {liveUrl && (
+            <a href={liveUrl} target="_blank" rel="noopener noreferrer" className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full flex items-center gap-1 animate-pulse">
+              <span>LIVE中</span>
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" /></svg>
+            </a>
+          )}
         </div>
         <div className="text-sm text-gray-600 mb-2 break-words whitespace-pre-line max-h-24 overflow-y-auto">{user.description || <span className="text-gray-400">(自己紹介なし)</span>}</div>
-        <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+        <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-2">
           <span>フォロワー: <b className="text-red-500">{user.follower_count.toLocaleString()}</b></span>
           <span>フォロー: <b className="text-teal-500">{user.following_count.toLocaleString()}</b></span>
           <span>国: {user.country || "-"}</span>
           <span>登録日: {user.date_joined ? user.date_joined.slice(0, 10) : "-"}</span>
         </div>
+        {/* LIVE情報 */}
+        {channelInfo?.recentLive && (
+          <div className="flex items-center gap-3 mb-1">
+            {channelInfo.recentLive.imgUrl && (
+              <img src={channelInfo.recentLive.imgUrl} alt="LIVEサムネ" className="w-14 h-14 object-cover rounded-lg border" />
+            )}
+            <div>
+              <div className="text-xs text-gray-500">最終LIVE: {new Date(channelInfo.recentLive.created).toLocaleString()}</div>
+              <div className="text-sm font-semibold text-gray-700 truncate max-w-[200px]" title={channelInfo.recentLive.title}>{channelInfo.recentLive.title}</div>
+            </div>
+          </div>
+        )}
+        {/* 直近配信予定 */}
+        {channelInfo?.nextSchedule && (
+          <div className="text-xs text-blue-600 mt-1">次回配信予定: {new Date(channelInfo.nextSchedule.scheduleDate).toLocaleString()} ({channelInfo.nextSchedule.title})</div>
+        )}
       </div>
     </div>
   );

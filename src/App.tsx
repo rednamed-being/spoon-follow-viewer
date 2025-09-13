@@ -23,6 +23,12 @@ import InputSection from "@/components/InputSection";
 import ErrorSection from "@/components/ErrorSection";
 import StatsSection from "@/components/StatsSection";
 import UserDetail from "@/components/UserDetail";
+// チャンネル情報型
+type ChannelInfo = {
+  currentLiveId: number | null;
+  recentLive: { created: string; title: string; imgUrl?: string } | null;
+  nextSchedule: { scheduleDate: string; title: string } | null;
+};
 // import FollowVisualizer from "@/components/FollowVisualizer"; // 重い可視化は無効化
 import FollowsTable from "@/components/FollowsTable";
 import { FollowData, UserData, SpoonUser } from "@/types/spoon";
@@ -33,6 +39,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [userDetail, setUserDetail] = useState<SpoonUser | null>(null);
+  const [channelInfo, setChannelInfo] = useState<ChannelInfo | null>(null);
   const [followData, setFollowData] = useState<FollowData | null>(null);
   const [proxy, setProxy] = useState<string>("");
 
@@ -71,6 +78,38 @@ export default function App() {
           profile_url: targetUser.profile_url,
         });
         setUserDetail(targetUser);
+        // チャンネル情報取得
+        try {
+          const res = await fetch(`https://jp-gw.spooncast.net/channels/${targetUser.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            const ch = data.result?.channel;
+            // 最終LIVE
+            const recentLive = ch?.recentLiveCasts?.[0]
+              ? {
+                  created: ch.recentLiveCasts[0].created,
+                  title: ch.recentLiveCasts[0].title,
+                  imgUrl: ch.recentLiveCasts[0].imgUrl,
+                }
+              : null;
+            // 直近予定
+            const nextSchedule = ch?.schedules?.[0]
+              ? {
+                  scheduleDate: ch.schedules[0].scheduleDate,
+                  title: ch.schedules[0].title,
+                }
+              : null;
+            setChannelInfo({
+              currentLiveId: ch.currentLiveId ?? null,
+              recentLive,
+              nextSchedule,
+            });
+          } else {
+            setChannelInfo(null);
+          }
+        } catch {
+          setChannelInfo(null);
+        }
         // 検索成功時のみログ送信
         await logRequestToSheet(targetUser.id.toString());
       } else {
@@ -81,6 +120,7 @@ export default function App() {
           profile_url: null,
         });
         setUserDetail(null);
+        setChannelInfo(null);
       }
     } catch (e: any) {
       setError(e?.message || "データの取得に失敗しました");
@@ -128,7 +168,7 @@ export default function App() {
           <>
             {userDetail && (
               <div className="px-2">
-                <UserDetail user={userDetail} />
+                <UserDetail user={userDetail} channelInfo={channelInfo} />
               </div>
             )}
             <div className="px-2">
