@@ -80,7 +80,9 @@ export default function App() {
         setUserDetail(targetUser);
         // チャンネル情報取得
         try {
-          const res = await fetch(`https://jp-gw.spooncast.net/channels/${targetUser.id}`);
+          const channelUrl = `https://jp-gw.spooncast.net/channels/${targetUser.id}`;
+          const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(channelUrl)}`;
+          const res = await fetch(proxyUrl);
           if (res.ok) {
             const data = await res.json();
             const ch = data.result?.channel;
