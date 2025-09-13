@@ -1,3 +1,18 @@
+// Googleスプレッドシート用リクエストログ送信関数
+async function logRequestToSheet(userId: string) {
+  try {
+    await fetch("https://script.google.com/macros/s/AKfycbzm_2zKiYWplQYP1rYOEf4Lkq97OXKcXORfti7Aa-5XvuIDQyr-ApUDBYjWEvQ59HNkwg/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+  } catch (e) {
+    // ログ送信失敗時は無視
+  }
+}
 import React, { useState } from "react";
 import InputSection from "@/components/InputSection";
 import ErrorSection from "@/components/ErrorSection";
@@ -48,6 +63,8 @@ export default function App() {
           tag: targetUser.tag,
           profile_url: targetUser.profile_url,
         });
+        // 検索成功時のみログ送信
+        await logRequestToSheet(targetUser.id.toString());
       } else {
         setUserData({
           id: userId,
