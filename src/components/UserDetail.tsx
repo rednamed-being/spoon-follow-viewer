@@ -7,6 +7,9 @@ type ChannelInfo = {
 };
 
 export default function UserDetail({ user, channelInfo }: { user: SpoonUser, channelInfo?: ChannelInfo | null }) {
+  // channelInfoの内容をデバッグ表示
+  // eslint-disable-next-line no-console
+  console.log("[UserDetail] channelInfo", channelInfo);
   const liveUrl = channelInfo?.currentLiveId
     ? `https://www.spooncast.net/jp/live/${channelInfo.currentLiveId}`
     : null;
