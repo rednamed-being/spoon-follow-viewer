@@ -96,9 +96,10 @@ export default function App() {
               : null;
             // 直近未来の配信予定のみ抽出
             let nextSchedule = null;
+            // channelの生データをデバッグ表示
+            // eslint-disable-next-line no-console
+            console.log('[Spoon channel] channel:', ch);
             if (Array.isArray(ch?.schedules)) {
-              // eslint-disable-next-line no-console
-              console.log('[Spoon channel] schedules:', ch.schedules);
               const now = new Date();
               const futureSchedules = ch.schedules
                 .filter((s: any) => {
