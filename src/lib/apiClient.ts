@@ -10,16 +10,11 @@ import type { SpoonApiResponse } from "@/types/spoon";
 // Spoon API をクライアントサイドのみで叩くための単純なクライアント
 // GitHub Pages ではサーバーサイドコードが使えないため、必要に応じて CORS 対応のプロキシを利用する
 
+import type { SpoonUser } from "@/types/spoon";
 interface UserInfoResponse {
   status_code: number;
   detail: string;
-  results: Array<{
-    id: number;
-    nickname: string;
-    tag: string;
-    profile_url: string;
-    // ...他の必要なフィールドがあれば追加
-  }>;
+  results: SpoonUser[];
 }
 
 interface FetchResult {

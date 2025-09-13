@@ -22,15 +22,17 @@ import React, { useState } from "react";
 import InputSection from "@/components/InputSection";
 import ErrorSection from "@/components/ErrorSection";
 import StatsSection from "@/components/StatsSection";
+import UserDetail from "@/components/UserDetail";
 // import FollowVisualizer from "@/components/FollowVisualizer"; // 重い可視化は無効化
 import FollowsTable from "@/components/FollowsTable";
-import { FollowData, UserData } from "@/types/spoon";
+import { FollowData, UserData, SpoonUser } from "@/types/spoon";
 import { fetchAll } from "@/lib/apiClient";
 
 export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [userDetail, setUserDetail] = useState<SpoonUser | null>(null);
   const [followData, setFollowData] = useState<FollowData | null>(null);
   const [proxy, setProxy] = useState<string>("");
 
@@ -68,6 +70,7 @@ export default function App() {
           tag: targetUser.tag,
           profile_url: targetUser.profile_url,
         });
+        setUserDetail(targetUser);
         // 検索成功時のみログ送信
         await logRequestToSheet(targetUser.id.toString());
       } else {
@@ -77,6 +80,7 @@ export default function App() {
           tag: `user_${userId}`,
           profile_url: null,
         });
+        setUserDetail(null);
       }
     } catch (e: any) {
       setError(e?.message || "データの取得に失敗しました");
@@ -122,6 +126,11 @@ export default function App() {
         {error && <ErrorSection message={error} />}
         {followData && userData && (
           <>
+            {userDetail && (
+              <div className="px-2">
+                <UserDetail user={userDetail} />
+              </div>
+            )}
             <div className="px-2">
               <StatsSection
                 followerCount={followData.followers.length}
