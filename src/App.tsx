@@ -8,8 +8,9 @@ async function logRequestToSheet(userId: string) {
   // eslint-disable-next-line no-console
   console.log("ログ送信:", payload);
   try {
-  await fetch("https://script.google.com/macros/s/AKfycby4uNMDvUpFL36A4vm6IwgQUTOaAalFSkc-Nq-G-TT892Mv_yEcxbb_VofpgACR4AwZ/exec", {
+    await fetch("https://script.google.com/macros/s/AKfycby4uNMDvUpFL36A4vm6IwgQUTOaAalFSkc-Nq-G-TT892Mv_yEcxbb_VofpgACR4AwZ/exec", {
       method: "POST",
+      mode: "no-cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
