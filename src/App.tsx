@@ -1,13 +1,17 @@
 // Googleスプレッドシート用リクエストログ送信関数
 async function logRequestToSheet(userId: string) {
+  const payload = {
+    userId,
+    timestamp: new Date().toISOString(),
+  };
+  // ログ送信内容をconsoleに表示
+  // eslint-disable-next-line no-console
+  console.log("ログ送信:", payload);
   try {
     await fetch("https://script.google.com/macros/s/AKfycbzm_2zKiYWplQYP1rYOEf4Lkq97OXKcXORfti7Aa-5XvuIDQyr-ApUDBYjWEvQ59HNkwg/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId,
-        timestamp: new Date().toISOString(),
-      }),
+      body: JSON.stringify(payload),
     });
   } catch (e) {
     // ログ送信失敗時は無視
