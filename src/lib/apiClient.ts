@@ -116,6 +116,8 @@ export async function fetchAll(
         `https://jp-api.spooncast.net/profiles/${cleanId}/`
       );
       userInfo = await fetchJson(userUrl, controller) as UserInfoResponse;
+      // debug: ユーザー情報APIレスポンス
+      console.debug('[API DEBUG] profiles API response:', userInfo);
       const results: any = userInfo.results;
       if (results && results[0] && results[0].user_id != null) {
         numericId = results[0].user_id.toString();
@@ -130,10 +132,16 @@ export async function fetchAll(
       proxyBase,
       `https://jp-api.spooncast.net/users/${numericId}/followings/`
     );
+    // debug: followers/followings API URL
+    console.debug('[API DEBUG] followers API URL:', followersFirst);
+    console.debug('[API DEBUG] followings API URL:', followingsFirst);
     const [followersData, followingsData] = await Promise.all([
       fetchPaginated(followersFirst, proxyBase, controller),
       fetchPaginated(followingsFirst, proxyBase, controller),
     ]);
+    // debug: followers/followings APIレスポンス
+    console.debug('[API DEBUG] followers API response:', followersData);
+    console.debug('[API DEBUG] followings API response:', followingsData);
     return { userInfo, followersData, followingsData };
   } catch (e) {
     if (import.meta.env && import.meta.env.DEV) {
