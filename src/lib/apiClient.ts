@@ -64,7 +64,7 @@ async function fetchJson(url: string, controller: AbortController) {
 async function fetchPaginated(
   firstUrl: string,
   proxyBase: string | undefined,
-  controller: AbortController,
+  controller: AbortController
 ): Promise<SpoonApiResponse> {
   let aggregated: SpoonApiResponse | null = null;
   let url: string | null = firstUrl;
@@ -116,29 +116,26 @@ export async function fetchAll(
         `https://jp-api.spooncast.net/profiles/${cleanId}/`
       );
       try {
-        userInfo = await fetchJson(userUrl, controller) as UserInfoResponse;
-        console.debug('[API DEBUG] profiles API response:', userInfo);
+        userInfo = (await fetchJson(userUrl, controller)) as UserInfoResponse;
+        console.debug("[API DEBUG] profiles API response:", userInfo);
         const results: any = userInfo.results;
         if (results && results[0] && results[0].user_id != null) {
           numericId = results[0].user_id.toString();
         }
       } catch (e) {
         userInfo = null;
-        console.debug('[API DEBUG] profiles API error:', e);
+        console.debug("[API DEBUG] profiles API error:", e);
       }
     }
     // ユーザー詳細はchannels APIで取得
     let channelInfo: any = null;
     try {
-      const channelUrl = buildUrl(
-        proxyBase,
-        `https://jp-gw.spooncast.net/channels/${numericId}`
-      );
+      const channelUrl = `https://asia-northeast1-spoon-472604.cloudfunctions.net/spoon-channel-api?user_id=${numericId}`;
       channelInfo = await fetchJson(channelUrl, controller);
-      console.debug('[API DEBUG] channels API response:', channelInfo);
+      console.debug("[API DEBUG] channels API response:", channelInfo);
     } catch (e) {
       channelInfo = null;
-      console.debug('[API DEBUG] channels API error:', e);
+      console.debug("[API DEBUG] channels API error:", e);
     }
     // followers/followingsは必ず数字IDでアクセス
     const followersFirst = buildUrl(
@@ -149,14 +146,14 @@ export async function fetchAll(
       proxyBase,
       `https://jp-api.spooncast.net/users/${numericId}/followings/`
     );
-    console.debug('[API DEBUG] followers API URL:', followersFirst);
-    console.debug('[API DEBUG] followings API URL:', followingsFirst);
+    console.debug("[API DEBUG] followers API URL:", followersFirst);
+    console.debug("[API DEBUG] followings API URL:", followingsFirst);
     const [followersData, followingsData] = await Promise.all([
       fetchPaginated(followersFirst, proxyBase, controller),
       fetchPaginated(followingsFirst, proxyBase, controller),
     ]);
-    console.debug('[API DEBUG] followers API response:', followersData);
-    console.debug('[API DEBUG] followings API response:', followingsData);
+    console.debug("[API DEBUG] followers API response:", followersData);
+    console.debug("[API DEBUG] followings API response:", followingsData);
     return { userInfo: channelInfo, followersData, followingsData };
   } catch (e) {
     if (import.meta.env && import.meta.env.DEV) {
