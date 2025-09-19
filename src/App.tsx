@@ -113,6 +113,8 @@ export default function App() {
         detailedUserInfo = allUsers.find(user => user.id === targetUserId);
         
         console.log("[DEBUG] detailedUserInfo from followers/followings:", detailedUserInfo);
+        console.log("[DEBUG] channelUser:", channelUser);
+        console.log("[DEBUG] channelInfo.fullChannelData:", channelInfo?.fullChannelData);
         
         finalUser = {
           id: channelUser.id || parseInt(userId.replace(/^@/, "")),
@@ -129,7 +131,7 @@ export default function App() {
           is_active: detailedUserInfo?.is_active || true,
           is_staff: detailedUserInfo?.is_staff || false,
           is_vip: channelUser.isVip || detailedUserInfo?.is_vip || false,
-          date_joined: detailedUserInfo?.date_joined || "",
+          date_joined: channelUser.dateJoined || channelInfo?.fullChannelData?.date_joined || detailedUserInfo?.date_joined || "",
           current_live: detailedUserInfo?.current_live || null,
           country: detailedUserInfo?.country || "",
           is_verified: channelUser.isVerified || detailedUserInfo?.is_verified || false,

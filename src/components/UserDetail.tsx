@@ -277,13 +277,23 @@ export default function UserDetail({
             </span>
           )}
           <span>
-            登録日: {user.date_joined ? 
-              new Date(user.date_joined).toLocaleDateString('ja-JP', {
-                timeZone: 'Asia/Tokyo',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              }) : "-"}
+            登録日: {(() => {
+              console.log('[DEBUG] user.date_joined:', user.date_joined);
+              if (!user.date_joined) return "-";
+              try {
+                const formattedDate = new Date(user.date_joined).toLocaleDateString('ja-JP', {
+                  timeZone: 'Asia/Tokyo',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                });
+                console.log('[DEBUG] formatted date:', formattedDate);
+                return formattedDate;
+              } catch (error) {
+                console.error('[DEBUG] date formatting error:', error);
+                return user.date_joined.slice(0, 10);
+              }
+            })()}
           </span>
         </div>
 
