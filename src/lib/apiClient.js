@@ -74,23 +74,45 @@ export async function fetchAll(userId, proxyBase) {
     try {
         let numericId = cleanId;
         let userInfo = null;
+        // @ID/英数字IDならprofiles APIで数字ID取得
         if (!isNumericId) {
-            // 英数字IDならユーザー情報APIでuser_id取得
             const userUrl = buildUrl(proxyBase, `https://jp-api.spooncast.net/profiles/${cleanId}/`);
-            userInfo = await fetchJson(userUrl, controller);
-            const results = userInfo.results;
-            if (results && results[0] && results[0].user_id != null) {
-                numericId = results[0].user_id.toString();
+            try {
+                userInfo = await fetchJson(userUrl, controller);
+                console.debug('[API DEBUG] profiles API response:', userInfo);
+                const results = userInfo.results;
+                if (results && results[0] && results[0].user_id != null) {
+                    numericId = results[0].user_id.toString();
+                }
             }
+            catch (e) {
+                userInfo = null;
+                console.debug('[API DEBUG] profiles API error:', e);
+            }
+        }
+        // ユーザー詳細はchannels APIで取得
+        let channelInfo = null;
+        try {
+            const channelUrl = buildUrl(proxyBase, `https://jp-gw.spooncast.net/channels/${numericId}`);
+            channelInfo = await fetchJson(channelUrl, controller);
+            console.debug('[API DEBUG] channels API response:', channelInfo);
+        }
+        catch (e) {
+            channelInfo = null;
+            console.debug('[API DEBUG] channels API error:', e);
         }
         // followers/followingsは必ず数字IDでアクセス
         const followersFirst = buildUrl(proxyBase, `https://jp-api.spooncast.net/users/${numericId}/followers/`);
         const followingsFirst = buildUrl(proxyBase, `https://jp-api.spooncast.net/users/${numericId}/followings/`);
+        console.debug('[API DEBUG] followers API URL:', followersFirst);
+        console.debug('[API DEBUG] followings API URL:', followingsFirst);
         const [followersData, followingsData] = await Promise.all([
             fetchPaginated(followersFirst, proxyBase, controller),
             fetchPaginated(followingsFirst, proxyBase, controller),
         ]);
-        return { userInfo, followersData, followingsData };
+        console.debug('[API DEBUG] followers API response:', followersData);
+        console.debug('[API DEBUG] followings API response:', followingsData);
+        return { userInfo: channelInfo, followersData, followingsData };
     }
     catch (e) {
         if (import.meta.env && import.meta.env.DEV) {
