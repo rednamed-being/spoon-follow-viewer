@@ -11,11 +11,31 @@ export default function InputSection({
 }: InputSectionProps) {
   const [userId, setUserId] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (userId.trim()) {
-      onLoadData(userId.trim());
+    const input = userId.trim();
+    if (!input) return;
+    // @で始まる場合はSpoon公式ページにアクセスしてリダイレクトURLからuserID抽出
+    if (input.startsWith("@")) {
+      try {
+        const res = await fetch(`https://www.spooncast.net/jp/${input}`, { method: "GET", redirect: "follow" });
+        // 最終リダイレクトURLからuserID抽出
+        const finalUrl = res.url;
+        const match = finalUrl.match(/\/channel\/(\d+)\/tab\/home/);
+        if (match && match[1]) {
+          onLoadData(match[1]);
+          return;
+        } else {
+          alert("ユーザーIDの取得に失敗しました。@IDが正しいかご確認ください。");
+          return;
+        }
+      } catch (err) {
+        alert("Spoon公式ページへのアクセスに失敗しました。");
+        return;
+      }
     }
+    // 通常の数字IDはそのまま渡す
+    onLoadData(input);
   };
 
   return (
