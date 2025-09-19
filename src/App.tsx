@@ -43,6 +43,16 @@ export default function App() {
   const [channelInfo, setChannelInfo] = useState<ChannelInfo | null>(null);
   const [followData, setFollowData] = useState<FollowData | null>(null);
   const [proxy, setProxy] = useState<string>("");
+  const [initialUserId, setInitialUserId] = useState<string>("");
+
+  React.useEffect(() => {
+    // パスからID抽出（例: /@07_trk_70, /316642663）
+    const path = window.location.pathname.replace(/^\//, "");
+    if (path && (path.match(/^@\w+/) || path.match(/^\d+$/))) {
+      setInitialUserId(path);
+      handleLoadData(path);
+    }
+  }, []);
 
   const handleLoadData = async (userId: string) => {
     setLoading(true);
@@ -170,7 +180,7 @@ export default function App() {
           </div>
         </div>
 
-        <InputSection onLoadData={handleLoadData} loading={loading} />
+  <InputSection onLoadData={handleLoadData} loading={loading} initialValue={initialUserId} />
         {error && <ErrorSection message={error} />}
         {followData && userData && (
           <>
