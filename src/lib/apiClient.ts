@@ -114,9 +114,9 @@ export async function fetchAll(
     const userInfo = await fetchJson(userUrl, controller);
     // user_id（数字）を抽出
     const userInfoTyped = userInfo as UserInfoResponse;
-    const results = userInfoTyped.results as any;
+    const results: any = userInfoTyped.results;
     const numericId =
-      results && results[0] && results[0].user_id
+      results && results[0] && results[0].user_id != null
         ? results[0].user_id.toString()
         : cleanId;
     const followersFirst = buildUrl(

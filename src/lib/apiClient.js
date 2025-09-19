@@ -76,7 +76,7 @@ export async function fetchAll(userId, proxyBase) {
         // user_id（数字）を抽出
         const userInfoTyped = userInfo;
         const results = userInfoTyped.results;
-        const numericId = results && results[0] && results[0].user_id
+        const numericId = results && results[0] && results[0].user_id != null
             ? results[0].user_id.toString()
             : cleanId;
         const followersFirst = buildUrl(proxyBase, `https://jp-api.spooncast.net/users/${numericId}/followers/`);
