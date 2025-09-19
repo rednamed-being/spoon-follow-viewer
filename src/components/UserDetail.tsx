@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { SpoonUser } from "@/types/spoon";
 
 type ChannelInfo = {
@@ -21,6 +22,9 @@ export default function UserDetail({
   user: SpoonUser;
   channelInfo?: ChannelInfo | null;
 }) {
+  const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
+  const [showFanNotice, setShowFanNotice] = useState(false);
+  
   // channelInfoの内容をデバッグ表示
   // eslint-disable-next-line no-console
   console.log("[UserDetail] channelInfo", channelInfo);
@@ -29,11 +33,19 @@ export default function UserDetail({
     : null;
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 flex flex-col md:flex-row items-center gap-6">
-      <img
-        src={user.profile_url || "/default-avatar.png"}
-        alt={user.nickname}
-        className="w-24 h-24 rounded-full object-cover border"
-      />
+      <a
+        href={`https://www.spooncast.net/jp/channel/${user.id}/tab/home`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block hover:opacity-80 transition-opacity"
+        title="チャンネルページを開く"
+      >
+        <img
+          src={user.profile_url || "/default-avatar.png"}
+          alt={user.nickname}
+          className="w-24 h-24 rounded-full object-cover border cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all"
+        />
+      </a>
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-2 mb-2">
           <span
@@ -83,29 +95,52 @@ export default function UserDetail({
           )}
         </div>
         
-        {/* channelInfoから追加の説明文 */}
+        {/* channelInfoから追加の説明文 - Collapse対応 */}
         {channelInfo?.fullChannelData?.description && channelInfo.fullChannelData.description !== user.description && (
-          <div className="text-sm text-blue-600 mb-2 break-words whitespace-pre-line max-h-24 overflow-y-auto bg-blue-50 p-2 rounded">
-            <div className="text-xs font-bold text-blue-700 mb-1">📢 追加情報:</div>
-            {channelInfo.fullChannelData.description}
+          <div className="mb-2">
+            <button
+              onClick={() => setShowAdditionalInfo(!showAdditionalInfo)}
+              className="flex items-center gap-2 text-sm font-medium text-blue-700 hover:text-blue-800 transition-colors"
+            >
+              <span>{showAdditionalInfo ? '📄' : '📢'}</span>
+              <span>追加情報</span>
+              <span className="text-xs">
+                {showAdditionalInfo ? '▼' : '▶'}
+              </span>
+            </button>
+            {showAdditionalInfo && (
+              <div className="mt-2 text-sm text-blue-600 break-words whitespace-pre-line max-h-32 overflow-y-auto bg-blue-50 p-3 rounded border-l-4 border-blue-300">
+                {channelInfo.fullChannelData.description}
+              </div>
+            )}
           </div>
         )}
         
-                {/* 自己紹介 */}
-        {(user.description || channelInfo?.fullChannelData?.fanNotice || channelInfo?.fullChannelData?.additionalDescription) && (
-          <div className="text-sm text-gray-700 mb-3">
-            {user.description && (
-              <p className="mb-2">{user.description}</p>
-            )}
-            {channelInfo?.fullChannelData?.fanNotice && (
-              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-2">
-                <p className="text-yellow-800 font-medium">📢 ファン通知</p>
+        {/* ファン通知 - Collapse対応 */}
+        {channelInfo?.fullChannelData?.fanNotice && (
+          <div className="mb-3">
+            <button
+              onClick={() => setShowFanNotice(!showFanNotice)}
+              className="flex items-center gap-2 text-sm font-medium text-yellow-700 hover:text-yellow-800 transition-colors"
+            >
+              <span>{showFanNotice ? '📢' : '📣'}</span>
+              <span>ファン通知</span>
+              <span className="text-xs">
+                {showFanNotice ? '▼' : '▶'}
+              </span>
+            </button>
+            {showFanNotice && (
+              <div className="mt-2 bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
                 <p className="text-yellow-700">{channelInfo.fullChannelData.fanNotice}</p>
               </div>
             )}
-            {channelInfo?.fullChannelData?.additionalDescription && (
-              <p className="text-gray-600 italic">{channelInfo.fullChannelData.additionalDescription}</p>
-            )}
+          </div>
+        )}
+
+        {/* その他の追加説明 */}
+        {channelInfo?.fullChannelData?.additionalDescription && (
+          <div className="text-sm text-gray-600 italic mb-3 p-2 bg-gray-50 rounded">
+            {channelInfo.fullChannelData.additionalDescription}
           </div>
         )}
 
@@ -221,18 +256,30 @@ export default function UserDetail({
           </div>
         )}
         <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-2">
-          <span>
+          <a
+            href={`https://www.spooncast.net/jp/channel/${user.id}/tab/followers`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-red-600 transition-colors cursor-pointer"
+            title="フォロワー一覧を開く"
+          >
             フォロワー:{" "}
             <b className="text-red-500">
               {channelInfo?.fullChannelData?.followerCount?.toLocaleString() || user.follower_count.toLocaleString()}
             </b>
-          </span>
-          <span>
+          </a>
+          <a
+            href={`https://www.spooncast.net/jp/channel/${user.id}/tab/followings`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-teal-600 transition-colors cursor-pointer"
+            title="フォロー一覧を開く"
+          >
             フォロー:{" "}
             <b className="text-teal-500">
               {user.following_count.toLocaleString()}
             </b>
-          </span>
+          </a>
           {channelInfo?.fullChannelData?.subscriberCount && channelInfo.fullChannelData.subscriberCount > 0 && (
             <span>
               サブスク:{" "}

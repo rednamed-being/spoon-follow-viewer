@@ -193,12 +193,20 @@ function FollowsTable({
             {filtered.map((u) => (
               <tr key={u.id} className="border-t hover:bg-purple-50/50">
                 <td className="p-1">
-                  <img
-                    src={u.profile_url || getDefaultAvatar()}
-                    onError={handleImgError}
-                    alt={u.nickname}
-                    className="w-10 h-10 rounded-full object-cover border"
-                  />
+                  <a
+                    href={`https://www.spooncast.net/jp/channel/${u.id}/tab/home`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block hover:opacity-80 transition-opacity"
+                    title="チャンネルページを開く"
+                  >
+                    <img
+                      src={u.profile_url || getDefaultAvatar()}
+                      onError={handleImgError}
+                      alt={u.nickname}
+                      className="w-10 h-10 rounded-full object-cover border cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all"
+                    />
+                  </a>
                 </td>
                 <td className="p-1">
                   <div
