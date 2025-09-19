@@ -9,28 +9,26 @@ export default function InputSection({
   onLoadData,
   loading,
 }: InputSectionProps) {
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const input = userId.trim();
+  const input = userId.trim();
     if (!input) return;
-    // @で始まる場合はSpoon公式ページにアクセスしてリダイレクトURLからuserID抽出
     if (input.startsWith("@")) {
       try {
-        const res = await fetch(`https://www.spooncast.net/jp/${input}`, { method: "GET", redirect: "follow" });
-        // 最終リダイレクトURLからuserID抽出
-        const finalUrl = res.url;
-        const match = finalUrl.match(/\/channel\/(\d+)\/tab\/home/);
-        if (match && match[1]) {
-          onLoadData(match[1]);
+        const cleanId = input.replace(/^@/, "");
+        const apiRes = await fetch(`https://jp-api.spooncast.net/profiles/${encodeURIComponent(cleanId)}/`);
+        const apiJson = await apiRes.json();
+        if (apiJson && apiJson.status_code === 200 && apiJson.results && apiJson.results.length > 0 && apiJson.results[0].user_id) {
+          onLoadData(apiJson.results[0].user_id.toString());
           return;
         } else {
           alert("ユーザーIDの取得に失敗しました。@IDが正しいかご確認ください。");
           return;
         }
       } catch (err) {
-        alert("Spoon公式ページへのアクセスに失敗しました。");
+        alert("Spooncast APIへのアクセスに失敗しました。");
         return;
       }
     }
@@ -59,7 +57,7 @@ export default function InputSection({
             type="text"
             id="userId"
             value={userId}
-            onChange={(e) => setUserId(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserId(e.target.value as string)}
             placeholder="例: 1234567890"
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
             disabled={loading}
@@ -67,7 +65,7 @@ export default function InputSection({
         </div>
         <button
           type="submit"
-          disabled={loading || !userId.trim()}
+            disabled={loading || !userId.trim()}
           className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transform hover:-translate-y-1 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
           {loading ? (
