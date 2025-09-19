@@ -135,7 +135,7 @@ export async function fetchAll(
         console.debug("[API DEBUG] profiles API error:", e);
       }
     }
-    // ユーザー詳細はchannels APIで取得
+    // ユーザー詳細はspoon-channel-apiで取得
     let channelInfo: ChannelInfoResponse | null = null;
     try {
       const channelUrl = `https://asia-northeast1-spoon-472604.cloudfunctions.net/spoon-channel-api?user_id=${numericId}`;
@@ -143,10 +143,11 @@ export async function fetchAll(
         channelUrl,
         controller
       )) as ChannelInfoResponse;
-      console.debug("[API DEBUG] channels API response:", channelInfo);
+      console.debug("[API DEBUG] spoon-channel-api response:", channelInfo);
+      console.debug("[API DEBUG] spoon-channel-api response (full):", JSON.stringify(channelInfo, null, 2));
     } catch (e) {
       channelInfo = null;
-      console.debug("[API DEBUG] channels API error:", e);
+      console.debug("[API DEBUG] spoon-channel-api error:", e);
     }
     // followers/followingsは必ず数字IDでアクセス
     const followersFirst = buildUrl(

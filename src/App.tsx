@@ -32,6 +32,13 @@ type ChannelInfo = {
   recentLive: { created: string; title: string; imgUrl?: string } | null;
   nextSchedule: { scheduleDate: string; title: string } | null;
   allSchedules?: any[] | null;
+  // 新しく追加する情報
+  socialLinks?: any[] | null;
+  topFans?: any[] | null;
+  popularCasts?: any[] | null;
+  recentPosts?: any[] | null;
+  analysis?: any | null;
+  fullChannelData?: any | null;
 };
 // import FollowVisualizer from "@/components/FollowVisualizer"; // 重い可視化は無効化
 import FollowsTable from "@/components/FollowsTable";
@@ -132,7 +139,7 @@ export default function App() {
           id: profilesUser.user_id,
           nickname: `ユーザー ${profilesUser.user_id}`,
           tag: `user_${profilesUser.user_id}`,
-          profile_url: null,
+          profile_url: "",
           top_impressions: [],
           description: "",
           gender: 0,
@@ -161,6 +168,8 @@ export default function App() {
         // 新しいCloud Functions APIから取得したチャンネル情報を使用
         if (channelInfo) {
           const ch = channelInfo.result?.channel;
+          console.log("[Spoon channel] full channel data:", ch);
+          
           // 最終LIVE
           const recentLive = ch?.recentLiveCasts?.[0]
             ? {
@@ -172,19 +181,23 @@ export default function App() {
           // 直近未来の配信予定のみ抽出
           let nextSchedule = null;
           let allSchedules = null;
-          // channelの生データをデバッグ表示
-          // eslint-disable-next-line no-console
-          console.log("[Spoon channel] channel:", ch);
           if (Array.isArray(ch?.schedules)) {
-            const now = new Date();
             allSchedules = ch.schedules; // 取得した全schedulesを渡す
             nextSchedule = null; // nextScheduleはnullに設定
           }
+          
           setChannelInfo({
             currentLiveId: ch?.currentLiveId ?? null,
             recentLive,
             nextSchedule: null,
             allSchedules,
+            // 新しい情報を追加
+            socialLinks: ch?.socialLinks || null,
+            topFans: ch?.topFans || null,
+            popularCasts: ch?.popularCasts || null,
+            recentPosts: ch?.recentPosts || null,
+            analysis: (channelInfo.result as any)?.analysis || null,
+            fullChannelData: ch || null,
           });
         } else {
           setChannelInfo(null);
@@ -219,7 +232,7 @@ export default function App() {
         </header>
         {/* バージョン表記 */}
         <div className="fixed bottom-2 right-4 bg-white/80 text-xs text-gray-700 px-3 py-1 rounded shadow z-50">
-          v1.3.0
+          v1.4.0
         </div>
 
         {/* プロキシURL入力欄（Collapse/Accordionで一番下に移動） */}
