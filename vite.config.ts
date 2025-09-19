@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  base: "/spoon-follow-viewer/", // GitHub Pagesリポジトリ名に合わせる
+  base: "/", // カスタムドメイン用にルートパスに戻す
   plugins: [react()],
   build: {
     rollupOptions: {
