@@ -107,19 +107,21 @@ export async function fetchAll(
     proxyBase,
     `https://jp-api.spooncast.net/profiles/${cleanId}/`
   );
-  const followersFirst = buildUrl(
-    proxyBase,
-    `https://jp-api.spooncast.net/profiles/${cleanId}/followers/`
-  );
-  const followingsFirst = buildUrl(
-    proxyBase,
-    `https://jp-api.spooncast.net/profiles/${cleanId}/followings/`
-  );
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000); // ページ数増加に備えて延長
+  const timeout = setTimeout(() => controller.abort(), 30000);
   try {
     const userInfo = await fetchJson(userUrl, controller);
+    // user_id（数字）を抽出
+    const numericId = userInfo?.results?.[0]?.user_id?.toString() ?? cleanId;
+    const followersFirst = buildUrl(
+      proxyBase,
+      `https://jp-api.spooncast.net/profiles/${numericId}/followers/`
+    );
+    const followingsFirst = buildUrl(
+      proxyBase,
+      `https://jp-api.spooncast.net/profiles/${numericId}/followings/`
+    );
     const [followersData, followingsData] = await Promise.all([
       fetchPaginated(followersFirst, proxyBase, controller),
       fetchPaginated(followingsFirst, proxyBase, controller),
@@ -127,7 +129,6 @@ export async function fetchAll(
     return { userInfo, followersData, followingsData };
   } catch (e) {
     if (import.meta.env && import.meta.env.DEV) {
-      // 開発環境のみエラー詳細を出力
       // eslint-disable-next-line no-console
       console.error("API fetch error", e);
     }
