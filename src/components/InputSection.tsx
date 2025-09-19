@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 interface InputSectionProps {
   onLoadData: (userId: string) => void;
@@ -11,7 +11,12 @@ export default function InputSection({
     loading,
     initialValue = "",
   }: InputSectionProps) {
-    const [userId, setUserId] = useState<string>(initialValue);
+  const [userId, setUserId] = useState<string>(initialValue);
+
+    // initialValueが変化したらuserIdにも反映
+    React.useEffect(() => {
+      setUserId(initialValue);
+    }, [initialValue]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,18 +24,18 @@ export default function InputSection({
     if (!input) return;
     if (input.startsWith("@")) {
       try {
-        const cleanId = input.replace(/^@/, "");
-  const apiRes = await fetch(`https://jp-api.spooncast.net/profiles/${encodeURIComponent(cleanId)}/`);
+    const cleanId = input.replace(/^@/, "");
+    const apiRes = await fetch(`https://jp-api.spooncast.net/profiles/${encodeURIComponent(cleanId)}/`);
         const apiJson = await apiRes.json();
         if (apiJson && apiJson.status_code === 200 && apiJson.results && apiJson.results.length > 0 && apiJson.results[0].user_id) {
-          onLoadData(String(apiJson.results[0].user_id));
+          onLoadData(apiJson.results[0].user_id.toString());
           return;
         } else {
-          (window as any).alert("ユーザーIDの取得に失敗しました。@IDが正しいかご確認ください。");
+          window.alert("ユーザーIDの取得に失敗しました。@IDが正しいかご確認ください。");
           return;
         }
       } catch (err) {
-  (window as any).alert("Spooncast APIへのアクセスに失敗しました。");
+    window.alert("Spooncast APIへのアクセスに失敗しました。");
         return;
       }
     }
@@ -59,7 +64,7 @@ export default function InputSection({
             type="text"
             id="userId"
             value={userId}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserId((e.target as HTMLInputElement).value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserId(e.currentTarget.value)}
             placeholder="例: 1234567890 / @xxx"
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
             disabled={loading}
