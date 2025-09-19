@@ -102,17 +102,18 @@ export async function fetchAll(
   userId: string,
   proxyBase?: string
 ): Promise<FetchResult> {
+  const cleanId = userId.replace(/^@/, "");
   const userUrl = buildUrl(
     proxyBase,
-    `https://jp-api.spooncast.net/profiles/${userId}/`
+    `https://jp-api.spooncast.net/profiles/${cleanId}/`
   );
   const followersFirst = buildUrl(
     proxyBase,
-    `https://jp-api.spooncast.net/profiles/${userId}/followers/`
+    `https://jp-api.spooncast.net/profiles/${cleanId}/followers/`
   );
   const followingsFirst = buildUrl(
     proxyBase,
-    `https://jp-api.spooncast.net/profiles/${userId}/followings/`
+    `https://jp-api.spooncast.net/profiles/${cleanId}/followings/`
   );
 
   const controller = new AbortController();
