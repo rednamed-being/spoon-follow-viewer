@@ -63,10 +63,8 @@ export default function App() {
     setUserData(null);
     setFollowData(null);
     try {
-      const { userInfo, channelInfo, followersData, followingsData } = await fetchAll(
-        userId,
-        proxy || undefined
-      );
+      const { userInfo, channelInfo, followersData, followingsData } =
+        await fetchAll(userId, proxy || undefined);
 
       const followerIds = new Set(
         followersData.results?.map((f: any) => f.id) || []
@@ -84,15 +82,27 @@ export default function App() {
       });
 
       const targetUser = userInfo?.results?.[0];
-      if (targetUser && targetUser.id != null) {
+      console.log("[DEBUG] userInfo:", userInfo);
+      console.log("[DEBUG] channelInfo:", channelInfo);
+      console.log("[DEBUG] targetUser:", targetUser);
+      
+      // 数字IDの場合はuserInfoがnullなので、channelInfoからユーザー情報を取得
+      let finalUser = targetUser;
+      if (!finalUser && channelInfo) {
+        console.log("[DEBUG] channelInfo full structure:", JSON.stringify(channelInfo, null, 2));
+        // 実際のAPI構造に基づいて調整が必要
+        // まずはデバッグでchannelInfoの構造を確認
+      }
+      
+      if (finalUser && finalUser.id != null) {
         setUserData({
-          id: targetUser.id.toString(),
-          nickname: targetUser.nickname,
-          tag: targetUser.tag,
-          profile_url: targetUser.profile_url,
+          id: finalUser.id.toString(),
+          nickname: finalUser.nickname,
+          tag: finalUser.tag,
+          profile_url: finalUser.profile_url,
         });
-        setUserDetail(targetUser);
-        
+        setUserDetail(finalUser);
+
         // 新しいCloud Functions APIから取得したチャンネル情報を使用
         if (channelInfo) {
           const ch = channelInfo.result?.channel;
@@ -124,9 +134,9 @@ export default function App() {
         } else {
           setChannelInfo(null);
         }
-        
+
         // 検索成功時のみログ送信
-        await logRequestToSheet(targetUser.id.toString());
+        await logRequestToSheet(finalUser.id.toString());
       } else {
         setUserData({
           id: userId,

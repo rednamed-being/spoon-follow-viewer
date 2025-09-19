@@ -19,16 +19,9 @@ interface UserInfoResponse {
 
 interface ChannelInfoResponse {
   result?: {
-    channel?: {
-      currentLiveId?: number;
-      recentLiveCasts?: Array<{
-        created: string;
-        title: string;
-        imgUrl?: string;
-      }>;
-      schedules?: any[];
-    };
+    channel?: any; // 実際のデータ構造が不明なので一旦anyに
   };
+  [key: string]: any; // その他のプロパティも許可
 }
 
 interface FetchResult {
@@ -146,7 +139,10 @@ export async function fetchAll(
     let channelInfo: ChannelInfoResponse | null = null;
     try {
       const channelUrl = `https://asia-northeast1-spoon-472604.cloudfunctions.net/spoon-channel-api?user_id=${numericId}`;
-      channelInfo = await fetchJson(channelUrl, controller) as ChannelInfoResponse;
+      channelInfo = (await fetchJson(
+        channelUrl,
+        controller
+      )) as ChannelInfoResponse;
       console.debug("[API DEBUG] channels API response:", channelInfo);
     } catch (e) {
       channelInfo = null;
