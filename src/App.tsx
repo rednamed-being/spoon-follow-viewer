@@ -28,6 +28,7 @@ type ChannelInfo = {
   currentLiveId: number | null;
   recentLive: { created: string; title: string; imgUrl?: string } | null;
   nextSchedule: { scheduleDate: string; title: string } | null;
+  allSchedules?: any[] | null;
 };
 // import FollowVisualizer from "@/components/FollowVisualizer"; // 重い可視化は無効化
 import FollowsTable from "@/components/FollowsTable";
@@ -96,28 +97,20 @@ export default function App() {
               : null;
             // 直近未来の配信予定のみ抽出
             let nextSchedule = null;
+            let allSchedules = null;
             // channelの生データをデバッグ表示
             // eslint-disable-next-line no-console
             console.log('[Spoon channel] channel:', ch);
             if (Array.isArray(ch?.schedules)) {
               const now = new Date();
-              const futureSchedules = ch.schedules
-                .filter((s: any) => {
-                  const d = new Date(s.scheduleDate);
-                  return d > now && d.getFullYear() < 2100; // 9000年などダミー除外
-                })
-                .sort((a: any, b: any) => new Date(a.scheduleDate).getTime() - new Date(b.scheduleDate).getTime());
-              if (futureSchedules.length > 0) {
-                nextSchedule = {
-                  scheduleDate: futureSchedules[0].scheduleDate,
-                  title: futureSchedules[0].title,
-                };
-              }
+                allSchedules = ch.schedules; // 取得した全schedulesを渡す
+                nextSchedule = null; // nextScheduleはnullに設定
             }
             setChannelInfo({
               currentLiveId: ch.currentLiveId ?? null,
               recentLive,
-              nextSchedule,
+                nextSchedule: null,
+                allSchedules,
             });
           } else {
             setChannelInfo(null);

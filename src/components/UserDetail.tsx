@@ -3,7 +3,8 @@ import { SpoonUser } from "@/types/spoon";
 type ChannelInfo = {
   currentLiveId: number | null;
   recentLive: { created: string; title: string; imgUrl?: string } | null;
-  nextSchedule: { scheduleDate: string; title: string } | null;
+  nextSchedule?: { scheduleDate: string; title: string } | null;
+  allSchedules?: any[] | null;
 };
 
 export default function UserDetail({ user, channelInfo }: { user: SpoonUser, channelInfo?: ChannelInfo | null }) {
@@ -56,9 +57,18 @@ export default function UserDetail({ user, channelInfo }: { user: SpoonUser, cha
             </div>
           </div>
         )}
-        {/* 直近配信予定 */}
-        {channelInfo?.nextSchedule && (
-          <div className="text-xs text-blue-600 mt-1">次回配信予定: {new Date(channelInfo.nextSchedule.scheduleDate).toLocaleString()} ({channelInfo.nextSchedule.title})</div>
+        {/* 取得した全schedulesを表示 */}
+        {channelInfo?.allSchedules && channelInfo.allSchedules.length > 0 && (
+          <div className="mt-2">
+            <div className="text-xs font-bold text-blue-700 mb-1">配信予定一覧:</div>
+            <ul className="text-xs text-blue-600 space-y-1">
+              {channelInfo.allSchedules.map((s, i) => (
+                <li key={i}>
+                  {new Date(s.scheduleDate).toLocaleString()} ({s.title})
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </div>
