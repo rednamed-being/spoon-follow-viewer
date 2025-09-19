@@ -256,30 +256,18 @@ export default function UserDetail({
           </div>
         )}
         <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-2">
-          <a
-            href={`https://www.spooncast.net/jp/channel/${user.id}/tab/followers`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-red-600 transition-colors cursor-pointer"
-            title="フォロワー一覧を開く"
-          >
+          <span>
             フォロワー:{" "}
             <b className="text-red-500">
               {channelInfo?.fullChannelData?.followerCount?.toLocaleString() || user.follower_count.toLocaleString()}
             </b>
-          </a>
-          <a
-            href={`https://www.spooncast.net/jp/channel/${user.id}/tab/followings`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-teal-600 transition-colors cursor-pointer"
-            title="フォロー一覧を開く"
-          >
+          </span>
+          <span>
             フォロー:{" "}
             <b className="text-teal-500">
               {channelInfo?.fullChannelData?.followingCount?.toLocaleString() || user.following_count.toLocaleString()}
             </b>
-          </a>
+          </span>
           {channelInfo?.fullChannelData?.subscriberCount && channelInfo.fullChannelData.subscriberCount > 0 && (
             <span>
               サブスク:{" "}
@@ -288,9 +276,14 @@ export default function UserDetail({
               </b>
             </span>
           )}
-          <span>国: {user.country || "-"}</span>
           <span>
-            登録日: {user.date_joined ? user.date_joined.slice(0, 10) : "-"}
+            登録日: {user.date_joined ? 
+              new Date(user.date_joined).toLocaleDateString('ja-JP', {
+                timeZone: 'Asia/Tokyo',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              }) : "-"}
           </span>
         </div>
 
