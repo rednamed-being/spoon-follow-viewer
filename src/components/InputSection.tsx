@@ -58,7 +58,7 @@ export default function InputSection({
             id="userId"
             value={userId}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserId(e.target.value as string)}
-            placeholder="例: 1234567890"
+            placeholder="例: 1234567890 / @xxx"
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
             disabled={loading}
           />
