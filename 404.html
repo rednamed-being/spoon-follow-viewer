@@ -7,7 +7,17 @@
 </head>
 <body>
   <script>
-    location.replace('/index.html' + location.search + location.hash);
+    // 元のURLを維持しつつindex.htmlを表示
+    if (!location.pathname.endsWith('/index.html')) {
+      fetch('/index.html')
+        .then(res => res.text())
+        .then(html => {
+          document.open();
+          document.write(html);
+          document.close();
+          history.replaceState(null, '', location.pathname + location.search + location.hash);
+        });
+    }
   </script>
   <noscript>
     <h1>404 Not Found</h1>
