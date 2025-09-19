@@ -93,25 +93,38 @@ export default function App() {
       // channelInfoから詳細なユーザー情報を構築
       let finalUser = null;
       if (channelUser) {
+        // フォロワー/フォロー中リストから対象ユーザーの詳細情報を探す
+        const targetUserId = channelUser.id;
+        let detailedUserInfo = null;
+        
+        // followersとfollowingsの結果から、対象ユーザーの詳細情報を探す
+        const allUsers = [
+          ...(followersData.results || []),
+          ...(followingsData.results || [])
+        ];
+        detailedUserInfo = allUsers.find(user => user.id === targetUserId);
+        
+        console.log("[DEBUG] detailedUserInfo from followers/followings:", detailedUserInfo);
+        
         finalUser = {
           id: channelUser.id || parseInt(userId.replace(/^@/, "")),
           nickname: channelUser.nickname || `ユーザー ${userId}`,
-          tag: channelUser.tag || `user_${userId}`,
-          profile_url: channelUser.profileUrl || null,
+          tag: channelUser.tag || detailedUserInfo?.tag || `user_${userId}`,
+          profile_url: channelUser.profileUrl || detailedUserInfo?.profile_url || "",
           // SpoonUser型の必須プロパティを設定
-          top_impressions: [],
-          description: channelUser.selfIntroduction || "",
-          gender: 0,
-          follow_status: 0,
-          follower_count: channelUser.followerCount || 0,
-          following_count: channelUser.followingCount || 0,
-          is_active: true,
-          is_staff: false,
-          is_vip: channelUser.isVip || false,
-          date_joined: channelUser.dateJoined || "",
-          current_live: null,
-          country: channelUser.country || "",
-          is_verified: channelUser.isVerified || false,
+          top_impressions: detailedUserInfo?.top_impressions || [],
+          description: channelUser.selfIntroduction || detailedUserInfo?.description || "",
+          gender: detailedUserInfo?.gender || 0,
+          follow_status: detailedUserInfo?.follow_status || 0,
+          follower_count: detailedUserInfo?.follower_count || 0,
+          following_count: detailedUserInfo?.following_count || 0,
+          is_active: detailedUserInfo?.is_active || true,
+          is_staff: detailedUserInfo?.is_staff || false,
+          is_vip: channelUser.isVip || detailedUserInfo?.is_vip || false,
+          date_joined: detailedUserInfo?.date_joined || "",
+          current_live: detailedUserInfo?.current_live || null,
+          country: detailedUserInfo?.country || "",
+          is_verified: channelUser.isVerified || detailedUserInfo?.is_verified || false,
         };
       } else if (profilesUser) {
         // channelInfoが取得できない場合はprofilesUserから最低限の情報を使用
@@ -206,7 +219,7 @@ export default function App() {
         </header>
         {/* バージョン表記 */}
         <div className="fixed bottom-2 right-4 bg-white/80 text-xs text-gray-700 px-3 py-1 rounded shadow z-50">
-          v1.2.0
+          v1.3.0
         </div>
 
         {/* プロキシURL入力欄（Collapse/Accordionで一番下に移動） */}
@@ -248,8 +261,8 @@ export default function App() {
             )}
             <div className="px-2">
               <StatsSection
-                followerCount={followData.followers.length}
-                followingCount={followData.followings.length}
+                followerCount={userDetail?.follower_count || followData.followers.length}
+                followingCount={userDetail?.following_count || followData.followings.length}
                 mutualCount={followData.mutualFollows.length}
               />
             </div>
