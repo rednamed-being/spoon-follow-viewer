@@ -7,7 +7,13 @@ type ChannelInfo = {
   allSchedules?: any[] | null;
 };
 
-export default function UserDetail({ user, channelInfo }: { user: SpoonUser, channelInfo?: ChannelInfo | null }) {
+export default function UserDetail({
+  user,
+  channelInfo,
+}: {
+  user: SpoonUser;
+  channelInfo?: ChannelInfo | null;
+}) {
   // channelInfoの内容をデバッグ表示
   // eslint-disable-next-line no-console
   console.log("[UserDetail] channelInfo", channelInfo);
@@ -23,44 +29,100 @@ export default function UserDetail({ user, channelInfo }: { user: SpoonUser, cha
       />
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-2 mb-2">
-          <span className="text-xl font-bold text-gray-800 truncate max-w-xs" title={user.nickname}>{user.nickname}</span>
-          <span className="text-xs text-gray-500 truncate max-w-[120px]" title={user.tag}>@{user.tag}</span>
+          <span
+            className="text-xl font-bold text-gray-800 truncate max-w-xs"
+            title={user.nickname}
+          >
+            {user.nickname}
+          </span>
+          <span
+            className="text-xs text-gray-500 truncate max-w-[120px]"
+            title={user.tag}
+          >
+            @{user.tag}
+          </span>
           {user.is_verified && (
-            <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-600 text-xs rounded-full">認証済</span>
+            <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-600 text-xs rounded-full">
+              認証済
+            </span>
           )}
           {user.is_vip && (
-            <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">VIP</span>
+            <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">
+              VIP
+            </span>
           )}
           {liveUrl && (
-            <a href={liveUrl} target="_blank" rel="noopener noreferrer" className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full flex items-center gap-1 animate-pulse">
+            <a
+              href={liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full flex items-center gap-1 animate-pulse"
+            >
               <span>LIVE中</span>
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" /></svg>
+              <svg
+                width="16"
+                height="16"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <circle cx="8" cy="8" r="6" />
+              </svg>
             </a>
           )}
         </div>
-        <div className="text-sm text-gray-600 mb-2 break-words whitespace-pre-line max-h-24 overflow-y-auto">{user.description || <span className="text-gray-400">(自己紹介なし)</span>}</div>
+        <div className="text-sm text-gray-600 mb-2 break-words whitespace-pre-line max-h-24 overflow-y-auto">
+          {user.description || (
+            <span className="text-gray-400">(自己紹介なし)</span>
+          )}
+        </div>
         <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-2">
-          <span>フォロワー: <b className="text-red-500">{user.follower_count.toLocaleString()}</b></span>
-          <span>フォロー: <b className="text-teal-500">{user.following_count.toLocaleString()}</b></span>
+          <span>
+            フォロワー:{" "}
+            <b className="text-red-500">
+              {user.follower_count.toLocaleString()}
+            </b>
+          </span>
+          <span>
+            フォロー:{" "}
+            <b className="text-teal-500">
+              {user.following_count.toLocaleString()}
+            </b>
+          </span>
           <span>国: {user.country || "-"}</span>
-          <span>登録日: {user.date_joined ? user.date_joined.slice(0, 10) : "-"}</span>
+          <span>
+            登録日: {user.date_joined ? user.date_joined.slice(0, 10) : "-"}
+          </span>
         </div>
         {/* LIVE情報 */}
         {channelInfo?.recentLive && (
           <div className="flex items-center gap-3 mb-1">
             {channelInfo.recentLive.imgUrl && (
-              <img src={channelInfo.recentLive.imgUrl} alt="LIVEサムネ" className="w-14 h-14 object-cover rounded-lg border" />
+              <img
+                src={channelInfo.recentLive.imgUrl}
+                alt="LIVEサムネ"
+                className="w-14 h-14 object-cover rounded-lg border"
+              />
             )}
             <div>
-              <div className="text-xs text-gray-500">最終LIVE: {new Date(channelInfo.recentLive.created).toLocaleString()}</div>
-              <div className="text-sm font-semibold text-gray-700 truncate max-w-[200px]" title={channelInfo.recentLive.title}>{channelInfo.recentLive.title}</div>
+              <div className="text-xs text-gray-500">
+                最終LIVE:{" "}
+                {new Date(channelInfo.recentLive.created).toLocaleString()}
+              </div>
+              <div
+                className="text-sm font-semibold text-gray-700 truncate max-w-[200px]"
+                title={channelInfo.recentLive.title}
+              >
+                {channelInfo.recentLive.title}
+              </div>
             </div>
           </div>
         )}
         {/* 取得した全schedulesを表示 */}
         {channelInfo?.allSchedules && channelInfo.allSchedules.length > 0 && (
           <div className="mt-2">
-            <div className="text-xs font-bold text-blue-700 mb-1">配信予定一覧:</div>
+            <div className="text-xs font-bold text-blue-700 mb-1">
+              配信予定一覧:
+            </div>
             <ul className="text-xs text-blue-600 space-y-1">
               {channelInfo.allSchedules.map((s, i) => (
                 <li key={i}>

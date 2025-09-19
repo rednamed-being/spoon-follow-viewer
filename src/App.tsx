@@ -8,12 +8,15 @@ async function logRequestToSheet(userId: string) {
   // eslint-disable-next-line no-console
   console.log("ログ送信:", payload);
   try {
-    await fetch("https://script.google.com/macros/s/AKfycby4uNMDvUpFL36A4vm6IwgQUTOaAalFSkc-Nq-G-TT892Mv_yEcxbb_VofpgACR4AwZ/exec", {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    await fetch(
+      "https://script.google.com/macros/s/AKfycby4uNMDvUpFL36A4vm6IwgQUTOaAalFSkc-Nq-G-TT892Mv_yEcxbb_VofpgACR4AwZ/exec",
+      {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
   } catch (e) {
     // ログ送信失敗時は無視
   }
@@ -60,7 +63,7 @@ export default function App() {
     setUserData(null);
     setFollowData(null);
     try {
-      const { userInfo, followersData, followingsData } = await fetchAll(
+      const { userInfo, channelInfo, followersData, followingsData } = await fetchAll(
         userId,
         proxy || undefined
       );
@@ -89,45 +92,39 @@ export default function App() {
           profile_url: targetUser.profile_url,
         });
         setUserDetail(targetUser);
-        // チャンネル情報取得
-        try {
-          const channelUrl = `https://jp-gw.spooncast.net/channels/${targetUser.id}`;
-          const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(channelUrl)}`;
-          const res = await fetch(proxyUrl);
-          if (res.ok) {
-            const data = await res.json();
-            const ch = data.result?.channel;
-            // 最終LIVE
-            const recentLive = ch?.recentLiveCasts?.[0]
-              ? {
-                  created: ch.recentLiveCasts[0].created,
-                  title: ch.recentLiveCasts[0].title,
-                  imgUrl: ch.recentLiveCasts[0].imgUrl,
-                }
-              : null;
-            // 直近未来の配信予定のみ抽出
-            let nextSchedule = null;
-            let allSchedules = null;
-            // channelの生データをデバッグ表示
-            // eslint-disable-next-line no-console
-            console.log('[Spoon channel] channel:', ch);
-            if (Array.isArray(ch?.schedules)) {
-              const now = new Date();
-                allSchedules = ch.schedules; // 取得した全schedulesを渡す
-                nextSchedule = null; // nextScheduleはnullに設定
-            }
-            setChannelInfo({
-              currentLiveId: ch.currentLiveId ?? null,
-              recentLive,
-                nextSchedule: null,
-                allSchedules,
-            });
-          } else {
-            setChannelInfo(null);
+        
+        // 新しいCloud Functions APIから取得したチャンネル情報を使用
+        if (channelInfo) {
+          const ch = channelInfo.result?.channel;
+          // 最終LIVE
+          const recentLive = ch?.recentLiveCasts?.[0]
+            ? {
+                created: ch.recentLiveCasts[0].created,
+                title: ch.recentLiveCasts[0].title,
+                imgUrl: ch.recentLiveCasts[0].imgUrl,
+              }
+            : null;
+          // 直近未来の配信予定のみ抽出
+          let nextSchedule = null;
+          let allSchedules = null;
+          // channelの生データをデバッグ表示
+          // eslint-disable-next-line no-console
+          console.log("[Spoon channel] channel:", ch);
+          if (Array.isArray(ch?.schedules)) {
+            const now = new Date();
+            allSchedules = ch.schedules; // 取得した全schedulesを渡す
+            nextSchedule = null; // nextScheduleはnullに設定
           }
-        } catch {
+          setChannelInfo({
+            currentLiveId: ch?.currentLiveId ?? null,
+            recentLive,
+            nextSchedule: null,
+            allSchedules,
+          });
+        } else {
           setChannelInfo(null);
         }
+        
         // 検索成功時のみログ送信
         await logRequestToSheet(targetUser.id.toString());
       } else {
@@ -157,9 +154,8 @@ export default function App() {
         </header>
         {/* バージョン表記 */}
         <div className="fixed bottom-2 right-4 bg-white/80 text-xs text-gray-700 px-3 py-1 rounded shadow z-50">
-          v1.0.0
+          v1.1.0
         </div>
-
 
         {/* プロキシURL入力欄（Collapse/Accordionで一番下に移動） */}
         <div className="fixed bottom-0 left-0 w-full flex justify-center pointer-events-none z-40">
@@ -177,14 +173,19 @@ export default function App() {
                   className="px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <p className="text-xs text-gray-500">
-                  Spoon API が CORS でブロックされる場合は、任意の CORS解除プロキシを設定してください。
+                  Spoon API が CORS でブロックされる場合は、任意の
+                  CORS解除プロキシを設定してください。
                 </p>
               </div>
             </details>
           </div>
         </div>
 
-  <InputSection onLoadData={handleLoadData} loading={loading} initialValue={initialUserId} />
+        <InputSection
+          onLoadData={handleLoadData}
+          loading={loading}
+          initialValue={initialUserId}
+        />
         {error && <ErrorSection message={error} />}
         {followData && userData && (
           <>

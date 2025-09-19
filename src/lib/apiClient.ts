@@ -17,8 +17,23 @@ interface UserInfoResponse {
   results: SpoonUser[];
 }
 
+interface ChannelInfoResponse {
+  result?: {
+    channel?: {
+      currentLiveId?: number;
+      recentLiveCasts?: Array<{
+        created: string;
+        title: string;
+        imgUrl?: string;
+      }>;
+      schedules?: any[];
+    };
+  };
+}
+
 interface FetchResult {
   userInfo: UserInfoResponse | null;
+  channelInfo: ChannelInfoResponse | null;
   followersData: SpoonApiResponse;
   followingsData: SpoonApiResponse;
 }
@@ -128,10 +143,10 @@ export async function fetchAll(
       }
     }
     // ユーザー詳細はchannels APIで取得
-    let channelInfo: any = null;
+    let channelInfo: ChannelInfoResponse | null = null;
     try {
       const channelUrl = `https://asia-northeast1-spoon-472604.cloudfunctions.net/spoon-channel-api?user_id=${numericId}`;
-      channelInfo = await fetchJson(channelUrl, controller);
+      channelInfo = await fetchJson(channelUrl, controller) as ChannelInfoResponse;
       console.debug("[API DEBUG] channels API response:", channelInfo);
     } catch (e) {
       channelInfo = null;
@@ -154,7 +169,7 @@ export async function fetchAll(
     ]);
     console.debug("[API DEBUG] followers API response:", followersData);
     console.debug("[API DEBUG] followings API response:", followingsData);
-    return { userInfo: channelInfo, followersData, followingsData };
+    return { userInfo, channelInfo, followersData, followingsData };
   } catch (e) {
     if (import.meta.env && import.meta.env.DEV) {
       // eslint-disable-next-line no-console

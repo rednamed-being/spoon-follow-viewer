@@ -7,20 +7,20 @@ interface InputSectionProps {
 }
 
 export default function InputSection({
-    onLoadData,
-    loading,
-    initialValue = "",
-  }: InputSectionProps) {
+  onLoadData,
+  loading,
+  initialValue = "",
+}: InputSectionProps) {
   const [userId, setUserId] = useState<string>(initialValue);
 
-    // initialValueが変化したらuserIdにも反映
-    React.useEffect(() => {
-      setUserId(initialValue);
-    }, [initialValue]);
+  // initialValueが変化したらuserIdにも反映
+  React.useEffect(() => {
+    setUserId(initialValue);
+  }, [initialValue]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  const input: string = ((userId ?? "") as string).trim();
+    const input: string = ((userId ?? "") as string).trim();
     if (!input) return;
     // @IDも数字IDもそのまま渡す（fetchAllで一元処理）
     onLoadData(input);
@@ -47,7 +47,9 @@ export default function InputSection({
             type="text"
             id="userId"
             value={userId}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserId((e.currentTarget.value as string))}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setUserId(e.currentTarget.value as string)
+            }
             placeholder="例: 1234567890 / @xxx"
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
             disabled={loading}
@@ -55,7 +57,7 @@ export default function InputSection({
         </div>
         <button
           type="submit"
-            disabled={loading || !((userId ?? "") as string).trim()}
+          disabled={loading || !((userId ?? "") as string).trim()}
           className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transform hover:-translate-y-1 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
           {loading ? (

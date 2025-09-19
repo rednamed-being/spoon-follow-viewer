@@ -8,9 +8,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: "index.html",
-        notfound: "404.html"
-      }
-    }
+        notfound: "404.html",
+      },
+    },
   },
   resolve: {
     alias: {

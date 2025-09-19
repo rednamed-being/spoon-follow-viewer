@@ -8,10 +8,18 @@ const tabLabels: Record<TabKey, string> = {
   followings: "フォロー中",
 };
 
-function FollowsTable({ userData, followData }: { userData: UserData; followData: FollowData }) {
+function FollowsTable({
+  userData,
+  followData,
+}: {
+  userData: UserData;
+  followData: FollowData;
+}) {
   const [activeTab, setActiveTab] = useState<TabKey>("mutual");
   const [query, setQuery] = useState("");
-  const [sortKey, setSortKey] = useState<"order" | "nickname" | "follower_count" | "following_count">("order");
+  const [sortKey, setSortKey] = useState<
+    "order" | "nickname" | "follower_count" | "following_count"
+  >("order");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const dataMap: Record<TabKey, SpoonUser[]> = useMemo(
@@ -107,7 +115,7 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
               <select
                 className="border rounded px-1 py-0.5 text-xs"
                 value={sortKey}
-                onChange={e => setSortKey(e.target.value as any)}
+                onChange={(e) => setSortKey(e.target.value as any)}
               >
                 <option value="order">登録順</option>
                 <option value="nickname">名前順</option>
@@ -118,7 +126,9 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
                 type="button"
                 className="ml-1 text-gray-400 hover:text-gray-700"
                 title="昇順/降順切替"
-                onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")}
+                onClick={() =>
+                  setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+                }
               >
                 {sortDir === "asc" ? "▲" : "▼"}
               </button>
@@ -138,7 +148,10 @@ function FollowsTable({ userData, followData }: { userData: UserData; followData
         </div>
       </div>
       <div className="overflow-y-auto border rounded-xl max-h-[60vh]">
-  <table className="min-w-full table-fixed text-xs" style={{ tableLayout: 'fixed' }}>
+        <table
+          className="min-w-full table-fixed text-xs"
+          style={{ tableLayout: "fixed" }}
+        >
           <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
               <Th className="w-10 min-w-[40px] max-w-[40px]">アイコン</Th>
@@ -297,9 +310,12 @@ const Badge: React.FC<{
 const DEFAULT_AVATAR_BASE64 =
   "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNlMWUxZTEiLz48cGF0aCBkPSJNMjAgMThjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCAxLjc5LTQgNCAxLjc5IDQgNCA0em0wIDJjLTIuNjcgMC04IDEuMzQtOCA0djJoMTZ2LTJjMC0yLjY2LTUuMzMtNC04LTR6IiBmaWxsPSIjYmZiZmJmIi8+PC9zdmc+";
 
-
 // 種別アイコン
-function TypeIcon({ type }: { type: "mutual" | "follower" | "following" | "none" }) {
+function TypeIcon({
+  type,
+}: {
+  type: "mutual" | "follower" | "following" | "none";
+}) {
   const colorMap: Record<string, string> = {
     mutual: "#3b82f6", // blue-500
     follower: "#ef4444", // red-500
@@ -307,13 +323,23 @@ function TypeIcon({ type }: { type: "mutual" | "follower" | "following" | "none"
     none: "#d1d5db", // gray-300
   };
   return (
-    <svg width="16" height="16" className="inline-block align-middle" aria-label={type}>
-      <circle cx="8" cy="8" r="7" fill={colorMap[type]} stroke="#fff" strokeWidth="2" />
+    <svg
+      width="16"
+      height="16"
+      className="inline-block align-middle"
+      aria-label={type}
+    >
+      <circle
+        cx="8"
+        cy="8"
+        r="7"
+        fill={colorMap[type]}
+        stroke="#fff"
+        strokeWidth="2"
+      />
     </svg>
   );
 }
-
-
 
 function getDefaultAvatar() {
   return DEFAULT_AVATAR_BASE64;
