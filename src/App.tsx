@@ -206,7 +206,7 @@ export default function App() {
         </header>
         {/* バージョン表記 */}
         <div className="fixed bottom-2 right-4 bg-white/80 text-xs text-gray-700 px-3 py-1 rounded shadow z-50">
-          v1.1.0
+          v1.2.0
         </div>
 
         {/* プロキシURL入力欄（Collapse/Accordionで一番下に移動） */}
