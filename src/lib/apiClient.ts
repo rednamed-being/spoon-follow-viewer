@@ -14,7 +14,7 @@ import type { SpoonUser } from "@/types/spoon";
 interface UserInfoResponse {
   status_code: number;
   detail: string;
-  results: SpoonUser[];
+  results: Array<{ user_id: number }>; // 実際のレスポンス形式に合わせて修正
 }
 
 interface ChannelInfoResponse {

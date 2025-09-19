@@ -81,17 +81,59 @@ export default function App() {
         mutualFollows,
       });
 
-      const targetUser = userInfo?.results?.[0];
+      // userInfoとchannelInfoからユーザー情報を構築
+      const profilesUser = userInfo?.results?.[0];
+      const channelUser = channelInfo?.result?.channel;
+      
       console.log("[DEBUG] userInfo:", userInfo);
       console.log("[DEBUG] channelInfo:", channelInfo);
-      console.log("[DEBUG] targetUser:", targetUser);
+      console.log("[DEBUG] profilesUser:", profilesUser);
+      console.log("[DEBUG] channelUser:", channelUser);
       
-      // 数字IDの場合はuserInfoがnullなので、channelInfoからユーザー情報を取得
-      let finalUser = targetUser;
-      if (!finalUser && channelInfo) {
-        console.log("[DEBUG] channelInfo full structure:", JSON.stringify(channelInfo, null, 2));
-        // 実際のAPI構造に基づいて調整が必要
-        // まずはデバッグでchannelInfoの構造を確認
+      // channelInfoから詳細なユーザー情報を構築
+      let finalUser = null;
+      if (channelUser) {
+        finalUser = {
+          id: channelUser.id || parseInt(userId.replace(/^@/, "")),
+          nickname: channelUser.nickname || `ユーザー ${userId}`,
+          tag: channelUser.tag || `user_${userId}`,
+          profile_url: channelUser.profileUrl || null,
+          // SpoonUser型の必須プロパティを設定
+          top_impressions: [],
+          description: channelUser.selfIntroduction || "",
+          gender: 0,
+          follow_status: 0,
+          follower_count: channelUser.followerCount || 0,
+          following_count: channelUser.followingCount || 0,
+          is_active: true,
+          is_staff: false,
+          is_vip: channelUser.isVip || false,
+          date_joined: channelUser.dateJoined || "",
+          current_live: null,
+          country: channelUser.country || "",
+          is_verified: channelUser.isVerified || false,
+        };
+      } else if (profilesUser) {
+        // channelInfoが取得できない場合はprofilesUserから最低限の情報を使用
+        finalUser = {
+          id: profilesUser.user_id,
+          nickname: `ユーザー ${profilesUser.user_id}`,
+          tag: `user_${profilesUser.user_id}`,
+          profile_url: null,
+          top_impressions: [],
+          description: "",
+          gender: 0,
+          follow_status: 0,
+          follower_count: 0,
+          following_count: 0,
+          is_active: true,
+          is_staff: false,
+          is_vip: false,
+          date_joined: "",
+          current_live: null,
+          country: "",
+          is_verified: false,
+        };
       }
       
       if (finalUser && finalUser.id != null) {
