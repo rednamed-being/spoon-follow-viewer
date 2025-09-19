@@ -92,10 +92,10 @@ export default function UserDetail({
         )}
         
                 {/* 自己紹介 */}
-        {(user.self_introduction || channelInfo?.fullChannelData?.fanNotice || channelInfo?.fullChannelData?.additionalDescription) && (
+        {(user.description || channelInfo?.fullChannelData?.fanNotice || channelInfo?.fullChannelData?.additionalDescription) && (
           <div className="text-sm text-gray-700 mb-3">
-            {user.self_introduction && (
-              <p className="mb-2">{user.self_introduction}</p>
+            {user.description && (
+              <p className="mb-2">{user.description}</p>
             )}
             {channelInfo?.fullChannelData?.fanNotice && (
               <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-2">
@@ -114,7 +114,7 @@ export default function UserDetail({
           <div className="mb-3">
             <h4 className="text-sm font-medium text-gray-700 mb-2">🔗 ソーシャルリンク</h4>
             <div className="flex flex-wrap gap-2">
-              {channelInfo.fullChannelData.socialLinks.map((link, index) => (
+              {channelInfo.fullChannelData.socialLinks.map((link: any, index: number) => (
                 <a
                   key={index}
                   href={link.url}
@@ -142,7 +142,7 @@ export default function UserDetail({
           <div className="mb-3">
             <h4 className="text-sm font-medium text-gray-700 mb-2">👑 トップファン</h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {channelInfo.fullChannelData.topFans.slice(0, 6).map((fan, index) => (
+              {channelInfo.fullChannelData.topFans.slice(0, 6).map((fan: any, index: number) => (
                 <div key={fan.id} className="flex items-center space-x-2 p-2 bg-gray-50 rounded">
                   <img
                     src={fan.profileUrl || "/favicon.svg"}
@@ -172,7 +172,7 @@ export default function UserDetail({
           <div className="mb-3">
             <h4 className="text-sm font-medium text-gray-700 mb-2">📅 配信スケジュール</h4>
             <div className="space-y-2">
-              {channelInfo.fullChannelData.schedules.slice(0, 3).map((schedule, index) => (
+              {channelInfo.fullChannelData.schedules.slice(0, 3).map((schedule: any, index: number) => (
                 <div key={index} className="flex items-center space-x-3 p-2 bg-blue-50 rounded">
                   <div className="text-blue-600">📺</div>
                   <div className="flex-1">
@@ -197,7 +197,7 @@ export default function UserDetail({
           <div className="mb-3">
             <h4 className="text-sm font-medium text-gray-700 mb-2">� 最近の投稿</h4>
             <div className="space-y-2">
-              {channelInfo.fullChannelData.recentPosts.slice(0, 2).map((post, index) => (
+              {channelInfo.fullChannelData.recentPosts.slice(0, 2).map((post: any, index: number) => (
                 <div key={post.id} className="p-3 bg-gray-50 rounded">
                   {post.mediaUrl && (
                     <img

@@ -18,6 +18,32 @@ export interface SpoonUser {
   is_verified: boolean;
 }
 
+export interface SocialLink {
+  platform: string;
+  url: string;
+}
+
+export interface TopFan {
+  id: number;
+  nickname: string;
+  profileUrl: string;
+  spoonCount: number;
+}
+
+export interface Schedule {
+  title: string;
+  date: string;
+}
+
+export interface RecentPost {
+  id: number;
+  content: string;
+  mediaUrl?: string;
+  likeCount: number;
+  commentCount: number;
+  createdAt: string;
+}
+
 export interface UserData {
   id: string;
   nickname: string;
