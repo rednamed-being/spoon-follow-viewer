@@ -277,7 +277,7 @@ export default function UserDetail({
           >
             フォロー:{" "}
             <b className="text-teal-500">
-              {user.following_count.toLocaleString()}
+              {channelInfo?.fullChannelData?.followingCount?.toLocaleString() || user.following_count.toLocaleString()}
             </b>
           </a>
           {channelInfo?.fullChannelData?.subscriberCount && channelInfo.fullChannelData.subscriberCount > 0 && (

@@ -124,8 +124,8 @@ export default function App() {
           description: channelUser.selfIntroduction || detailedUserInfo?.description || "",
           gender: detailedUserInfo?.gender || 0,
           follow_status: detailedUserInfo?.follow_status || 0,
-          follower_count: detailedUserInfo?.follower_count || 0,
-          following_count: detailedUserInfo?.following_count || 0,
+          follower_count: channelInfo?.fullChannelData?.followerCount || detailedUserInfo?.follower_count || 0,
+          following_count: channelInfo?.fullChannelData?.followingCount || detailedUserInfo?.following_count || 0,
           is_active: detailedUserInfo?.is_active || true,
           is_staff: detailedUserInfo?.is_staff || false,
           is_vip: channelUser.isVip || detailedUserInfo?.is_vip || false,
@@ -275,8 +275,8 @@ export default function App() {
             )}
             <div className="px-2">
               <StatsSection
-                followerCount={userDetail?.follower_count || followData.followers.length}
-                followingCount={userDetail?.following_count || followData.followings.length}
+                followerCount={channelInfo?.fullChannelData?.followerCount || userDetail?.follower_count || followData.followers.length}
+                followingCount={channelInfo?.fullChannelData?.followingCount || userDetail?.following_count || followData.followings.length}
                 mutualCount={followData.mutualFollows.length}
               />
             </div>
