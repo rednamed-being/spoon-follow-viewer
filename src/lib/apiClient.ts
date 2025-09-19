@@ -116,11 +116,11 @@ export async function fetchAll(
     const numericId = userInfo?.results?.[0]?.user_id?.toString() ?? cleanId;
     const followersFirst = buildUrl(
       proxyBase,
-      `https://jp-api.spooncast.net/profiles/${numericId}/followers/`
+      `https://jp-api.spooncast.net/users/${numericId}/followers/`
     );
     const followingsFirst = buildUrl(
       proxyBase,
-      `https://jp-api.spooncast.net/profiles/${numericId}/followings/`
+      `https://jp-api.spooncast.net/users/${numericId}/followings/`
     );
     const [followersData, followingsData] = await Promise.all([
       fetchPaginated(followersFirst, proxyBase, controller),
