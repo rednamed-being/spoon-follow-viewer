@@ -80,7 +80,7 @@ export default function App() {
         mutualFollows,
       });
 
-      const targetUser = userInfo.results?.[0];
+  const targetUser = userInfo?.results?.[0];
       if (targetUser) {
         setUserData({
           id: targetUser.id.toString(),

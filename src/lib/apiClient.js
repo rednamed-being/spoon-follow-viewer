@@ -68,17 +68,22 @@ async function fetchPaginated(firstUrl, proxyBase, controller) {
 }
 export async function fetchAll(userId, proxyBase) {
     const cleanId = userId.replace(/^@/, "");
-    const userUrl = buildUrl(proxyBase, `https://jp-api.spooncast.net/profiles/${cleanId}/`);
+    const isNumericId = /^[0-9]+$/.test(cleanId);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
     try {
-        const userInfo = await fetchJson(userUrl, controller);
-        // user_id（数字）を抽出
-        const userInfoTyped = userInfo;
-        const results = userInfoTyped.results;
-        const numericId = results && results[0] && results[0].user_id != null
-            ? results[0].user_id.toString()
-            : cleanId;
+        let numericId = cleanId;
+        let userInfo = null;
+        if (!isNumericId) {
+            // 英数字IDならユーザー情報APIでuser_id取得
+            const userUrl = buildUrl(proxyBase, `https://jp-api.spooncast.net/profiles/${cleanId}/`);
+            userInfo = await fetchJson(userUrl, controller);
+            const results = userInfo.results;
+            if (results && results[0] && results[0].user_id != null) {
+                numericId = results[0].user_id.toString();
+            }
+        }
+        // followers/followingsは必ず数字IDでアクセス
         const followersFirst = buildUrl(proxyBase, `https://jp-api.spooncast.net/users/${numericId}/followers/`);
         const followingsFirst = buildUrl(proxyBase, `https://jp-api.spooncast.net/users/${numericId}/followings/`);
         const [followersData, followingsData] = await Promise.all([
