@@ -82,11 +82,149 @@ export default function UserDetail({
             <span className="text-gray-400">(自己紹介なし)</span>
           )}
         </div>
+        
+        {/* channelInfoから追加の説明文 */}
+        {channelInfo?.fullChannelData?.description && channelInfo.fullChannelData.description !== user.description && (
+          <div className="text-sm text-blue-600 mb-2 break-words whitespace-pre-line max-h-24 overflow-y-auto bg-blue-50 p-2 rounded">
+            <div className="text-xs font-bold text-blue-700 mb-1">📢 追加情報:</div>
+            {channelInfo.fullChannelData.description}
+          </div>
+        )}
+        
+                {/* 自己紹介 */}
+        {(user.self_introduction || channelInfo?.fullChannelData?.fanNotice || channelInfo?.fullChannelData?.additionalDescription) && (
+          <div className="text-sm text-gray-700 mb-3">
+            {user.self_introduction && (
+              <p className="mb-2">{user.self_introduction}</p>
+            )}
+            {channelInfo?.fullChannelData?.fanNotice && (
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-2">
+                <p className="text-yellow-800 font-medium">📢 ファン通知</p>
+                <p className="text-yellow-700">{channelInfo.fullChannelData.fanNotice}</p>
+              </div>
+            )}
+            {channelInfo?.fullChannelData?.additionalDescription && (
+              <p className="text-gray-600 italic">{channelInfo.fullChannelData.additionalDescription}</p>
+            )}
+          </div>
+        )}
+
+        {/* ソーシャルリンク */}
+        {channelInfo?.fullChannelData?.socialLinks && channelInfo.fullChannelData.socialLinks.length > 0 && (
+          <div className="mb-3">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">🔗 ソーシャルリンク</h4>
+            <div className="flex flex-wrap gap-2">
+              {channelInfo.fullChannelData.socialLinks.map((link, index) => (
+                <a
+                  key={index}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`px-3 py-1 text-xs rounded-full text-white ${
+                    link.platform === 'twitter' ? 'bg-blue-400' :
+                    link.platform === 'instagram' ? 'bg-pink-400' :
+                    link.platform === 'tiktok' ? 'bg-black' :
+                    'bg-gray-400'
+                  }`}
+                >
+                  {link.platform === 'twitter' && '🐦'}
+                  {link.platform === 'instagram' && '📷'}
+                  {link.platform === 'tiktok' && '🎵'}
+                  {link.platform || 'Link'}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* トップファン */}
+        {channelInfo?.fullChannelData?.topFans && channelInfo.fullChannelData.topFans.length > 0 && (
+          <div className="mb-3">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">👑 トップファン</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {channelInfo.fullChannelData.topFans.slice(0, 6).map((fan, index) => (
+                <div key={fan.id} className="flex items-center space-x-2 p-2 bg-gray-50 rounded">
+                  <img
+                    src={fan.profileUrl || "/favicon.svg"}
+                    alt={fan.nickname}
+                    className="w-8 h-8 rounded-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "/favicon.svg";
+                    }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-900 truncate">{fan.nickname}</p>
+                    <p className="text-xs text-gray-500">🥄 {fan.spoonCount?.toLocaleString() || 0}</p>
+                  </div>
+                  {index < 3 && (
+                    <span className="text-xs">
+                      {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 配信スケジュール */}
+        {channelInfo?.fullChannelData?.schedules && channelInfo.fullChannelData.schedules.length > 0 && (
+          <div className="mb-3">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">📅 配信スケジュール</h4>
+            <div className="space-y-2">
+              {channelInfo.fullChannelData.schedules.slice(0, 3).map((schedule, index) => (
+                <div key={index} className="flex items-center space-x-3 p-2 bg-blue-50 rounded">
+                  <div className="text-blue-600">📺</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{schedule.title}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(schedule.date).toLocaleDateString('ja-JP', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 最近の投稿 */}
+        {channelInfo?.fullChannelData?.recentPosts && channelInfo.fullChannelData.recentPosts.length > 0 && (
+          <div className="mb-3">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">� 最近の投稿</h4>
+            <div className="space-y-2">
+              {channelInfo.fullChannelData.recentPosts.slice(0, 2).map((post, index) => (
+                <div key={post.id} className="p-3 bg-gray-50 rounded">
+                  {post.mediaUrl && (
+                    <img
+                      src={post.mediaUrl}
+                      alt="投稿画像"
+                      className="w-full h-32 object-cover rounded mb-2"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  )}
+                  <p className="text-sm text-gray-800 mb-1">{post.content}</p>
+                  <div className="flex items-center space-x-3 text-xs text-gray-500">
+                    <span>❤️ {post.likeCount?.toLocaleString() || 0}</span>
+                    <span>💬 {post.commentCount?.toLocaleString() || 0}</span>
+                    <span>{new Date(post.createdAt).toLocaleDateString('ja-JP')}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-2">
           <span>
             フォロワー:{" "}
             <b className="text-red-500">
-              {user.follower_count.toLocaleString()}
+              {channelInfo?.fullChannelData?.followerCount?.toLocaleString() || user.follower_count.toLocaleString()}
             </b>
           </span>
           <span>
@@ -95,11 +233,51 @@ export default function UserDetail({
               {user.following_count.toLocaleString()}
             </b>
           </span>
+          {channelInfo?.fullChannelData?.subscriberCount && channelInfo.fullChannelData.subscriberCount > 0 && (
+            <span>
+              サブスク:{" "}
+              <b className="text-purple-500">
+                {channelInfo.fullChannelData.subscriberCount.toLocaleString()}
+              </b>
+            </span>
+          )}
           <span>国: {user.country || "-"}</span>
           <span>
             登録日: {user.date_joined ? user.date_joined.slice(0, 10) : "-"}
           </span>
         </div>
+
+        {/* メンバーシップ・ティア情報 */}
+        {(channelInfo?.fullChannelData?.membership || channelInfo?.fullChannelData?.tier) && (
+          <div className="mb-3">
+            <div className="flex flex-wrap gap-2">
+              {channelInfo.fullChannelData.membership?.grade && (
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  channelInfo.fullChannelData.membership.grade === 'PREMIUM' 
+                    ? 'bg-purple-100 text-purple-700' 
+                    : 'bg-blue-100 text-blue-700'
+                }`}>
+                  💎 {channelInfo.fullChannelData.membership.grade}
+                </span>
+              )}
+              {channelInfo.fullChannelData.tier && (
+                <span className="px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-700">
+                  🏆 {channelInfo.fullChannelData.tier.title}
+                </span>
+              )}
+              {channelInfo.fullChannelData.hasVoiceInfo && (
+                <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
+                  🎤 ボイス登録済み
+                </span>
+              )}
+              {channelInfo.fullChannelData.referralCode && (
+                <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">
+                  🔗 {channelInfo.fullChannelData.referralCode}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
         {/* LIVE情報 */}
         {channelInfo?.recentLive && (
           <div className="flex items-center gap-3 mb-1">
