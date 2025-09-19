@@ -27,6 +27,7 @@ interface ChannelInfoResponse {
 interface FetchResult {
   userInfo: UserInfoResponse | null;
   channelInfo: ChannelInfoResponse | null;
+  userDirectInfo: any | null; // jp-api.spooncast.net/users/{id}/ のレスポンス
   followersData: SpoonApiResponse;
   followingsData: SpoonApiResponse;
 }
@@ -149,6 +150,21 @@ export async function fetchAll(
       channelInfo = null;
       console.debug("[API DEBUG] spoon-channel-api error:", e);
     }
+    
+    // ユーザー直接API（jp-api.spooncast.net/users/{id}/）で詳細情報取得
+    let userDirectInfo: any | null = null;
+    try {
+      const userDirectUrl = buildUrl(
+        proxyBase,
+        `https://jp-api.spooncast.net/users/${numericId}/`
+      );
+      userDirectInfo = await fetchJson(userDirectUrl, controller);
+      console.debug("[API DEBUG] jp-api users API response:", userDirectInfo);
+    } catch (e) {
+      userDirectInfo = null;
+      console.debug("[API DEBUG] jp-api users API error:", e);
+    }
+    
     // followers/followingsは必ず数字IDでアクセス
     const followersFirst = buildUrl(
       proxyBase,
@@ -166,7 +182,7 @@ export async function fetchAll(
     ]);
     console.debug("[API DEBUG] followers API response:", followersData);
     console.debug("[API DEBUG] followings API response:", followingsData);
-    return { userInfo, channelInfo, followersData, followingsData };
+    return { userInfo, channelInfo, userDirectInfo, followersData, followingsData };
   } catch (e) {
     if (import.meta.env && import.meta.env.DEV) {
       // eslint-disable-next-line no-console

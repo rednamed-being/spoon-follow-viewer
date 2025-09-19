@@ -71,7 +71,7 @@ export default function App() {
     setUserData(null);
     setFollowData(null);
     try {
-      const { userInfo, channelInfo, followersData, followingsData } =
+      const { userInfo, channelInfo, userDirectInfo, followersData, followingsData } =
         await fetchAll(userId, proxy || undefined);
 
       const followerIds = new Set(
@@ -92,6 +92,11 @@ export default function App() {
       // userInfoとchannelInfoからユーザー情報を構築
       const profilesUser = userInfo?.results?.[0];
       const channelUser = channelInfo?.result?.channel;
+      const directUser = userDirectInfo; // jp-api.spooncast.net/users/{id}/ のレスポンス
+      
+      console.log("[DEBUG] profilesUser:", profilesUser);
+      console.log("[DEBUG] channelUser:", channelUser);
+      console.log("[DEBUG] directUser:", directUser);
       
       console.log("[DEBUG] userInfo:", userInfo);
       console.log("[DEBUG] channelInfo:", channelInfo);
@@ -114,6 +119,7 @@ export default function App() {
         
         console.log("[DEBUG] detailedUserInfo from followers/followings:", detailedUserInfo);
         console.log("[DEBUG] channelUser:", channelUser);
+        console.log("[DEBUG] directUser:", directUser);
         console.log("[DEBUG] channelInfo.fullChannelData:", channelInfo?.fullChannelData);
         
         finalUser = {
@@ -126,12 +132,12 @@ export default function App() {
           description: channelUser.selfIntroduction || detailedUserInfo?.description || "",
           gender: detailedUserInfo?.gender || 0,
           follow_status: detailedUserInfo?.follow_status || 0,
-          follower_count: channelInfo?.fullChannelData?.followerCount || detailedUserInfo?.follower_count || 0,
-          following_count: channelInfo?.fullChannelData?.followingCount || detailedUserInfo?.following_count || 0,
+          follower_count: directUser?.follower_count || channelInfo?.fullChannelData?.followerCount || detailedUserInfo?.follower_count || 0,
+          following_count: directUser?.following_count || channelInfo?.fullChannelData?.followingCount || detailedUserInfo?.following_count || 0,
           is_active: detailedUserInfo?.is_active || true,
           is_staff: detailedUserInfo?.is_staff || false,
           is_vip: channelUser.isVip || detailedUserInfo?.is_vip || false,
-          date_joined: channelUser.dateJoined || channelInfo?.fullChannelData?.date_joined || detailedUserInfo?.date_joined || "",
+          date_joined: directUser?.date_joined || channelUser?.dateJoined || channelInfo?.fullChannelData?.date_joined || detailedUserInfo?.date_joined || "",
           current_live: detailedUserInfo?.current_live || null,
           country: detailedUserInfo?.country || "",
           is_verified: channelUser.isVerified || detailedUserInfo?.is_verified || false,
