@@ -49,7 +49,7 @@ export default function InputSection({
           >
             ユーザーID{" "}
             <span className="text-xs text-gray-500">
-              （プロフィールURLの末尾の数字）
+              （プロフィールURLの末尾の数字、または@で始まるIDでも動作します）
             </span>
             :
           </label>
