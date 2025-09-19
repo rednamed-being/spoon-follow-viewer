@@ -26,6 +26,7 @@ import InputSection from "@/components/InputSection";
 import ErrorSection from "@/components/ErrorSection";
 import StatsSection from "@/components/StatsSection";
 import UserDetail from "@/components/UserDetail";
+import packageJson from "../package.json";
 // チャンネル情報型
 type ChannelInfo = {
   currentLiveId: number | null;
@@ -232,7 +233,7 @@ export default function App() {
         </header>
         {/* バージョン表記 */}
         <div className="fixed bottom-2 right-4 bg-white/80 text-xs text-gray-700 px-3 py-1 rounded shadow z-50">
-          v1.4.0
+          v{packageJson.version}
         </div>
 
         {/* プロキシURL入力欄（Collapse/Accordionで一番下に移動） */}
