@@ -268,6 +268,29 @@ export default function UserDetail({
               {channelInfo?.fullChannelData?.followingCount?.toLocaleString() || user.following_count.toLocaleString()}
             </b>
           </span>
+          <span>
+            ライブ状態:{" "}
+            {channelInfo?.currentLiveId ? (
+              <a
+                href={`https://www.spooncast.net/jp/live/@${user.tag}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-500 hover:underline cursor-pointer font-bold inline-flex items-center"
+                title="ライブを見る"
+              >
+                <span className="inline-block w-3 h-3 bg-green-500 rounded-full mr-1"></span>
+                ライブ中
+              </a>
+            ) : (
+              <b 
+                className="text-gray-400 inline-flex items-center"
+                title="オフライン"
+              >
+                <span className="inline-block w-3 h-3 bg-gray-400 rounded-full mr-1"></span>
+                オフライン
+              </b>
+            )}
+          </span>
           {channelInfo?.fullChannelData?.subscriberCount && channelInfo.fullChannelData.subscriberCount > 0 && (
             <span>
               サブスク:{" "}

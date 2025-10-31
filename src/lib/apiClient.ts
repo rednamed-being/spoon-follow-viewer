@@ -37,21 +37,6 @@ const defaultHeaders: Record<string, string> = {
   Accept: "application/json, text/plain, */*",
 };
 
-const buildUrl = (base: string | undefined, target: string) => {
-  if (!base) return target;
-  if (base.endsWith("/")) return base + encodeURIComponent(target);
-  return base + "/" + encodeURIComponent(target);
-};
-
-// 'next' に返ってくる URL をプロキシ経由形式に再構築
-const buildNextUrl = (
-  proxyBase: string | undefined,
-  nextUrl: string | null
-) => {
-  if (!nextUrl) return null;
-  return buildUrl(proxyBase, nextUrl);
-};
-
 async function fetchJson(url: string, controller: AbortController) {
   const res = await fetch(url, {
     headers: defaultHeaders,
@@ -72,7 +57,6 @@ async function fetchJson(url: string, controller: AbortController) {
  */
 async function fetchPaginated(
   firstUrl: string,
-  proxyBase: string | undefined,
   controller: AbortController
 ): Promise<SpoonApiResponse> {
   let aggregated: SpoonApiResponse | null = null;
@@ -90,8 +74,8 @@ async function fetchPaginated(
         ...(data.results || []),
       ];
     }
-    // 次ページ URL 再構築
-    const nextUrl = buildNextUrl(proxyBase, data.next || null);
+    // 次ページ URL をそのまま使用
+    const nextUrl = data.next || null;
     if (nextUrl && nextUrl === prevNext) {
       // nextが同じ値になったら取得停止
       break;
@@ -108,8 +92,7 @@ async function fetchPaginated(
 }
 
 export async function fetchAll(
-  userId: string,
-  proxyBase?: string
+  userId: string
 ): Promise<FetchResult> {
   const cleanId = userId.replace(/^@/, "");
   const isNumericId = /^[0-9]+$/.test(cleanId);
@@ -120,10 +103,7 @@ export async function fetchAll(
     let userInfo: UserInfoResponse | null = null;
     // @ID/英数字IDならprofiles APIで数字ID取得
     if (!isNumericId) {
-      const userUrl = buildUrl(
-        proxyBase,
-        `https://jp-api.spooncast.net/profiles/${cleanId}/`
-      );
+      const userUrl = `https://jp-api.spooncast.net/profiles/${cleanId}/`;
       try {
         userInfo = (await fetchJson(userUrl, controller)) as UserInfoResponse;
         console.debug("[API DEBUG] profiles API response:", userInfo);
@@ -154,10 +134,7 @@ export async function fetchAll(
     // ユーザー直接API（jp-api.spooncast.net/users/{id}/）で詳細情報取得
     let userDirectInfo: any | null = null;
     try {
-      const userDirectUrl = buildUrl(
-        proxyBase,
-        `https://jp-api.spooncast.net/users/${numericId}/`
-      );
+      const userDirectUrl = `https://jp-api.spooncast.net/users/${numericId}/`;
       userDirectInfo = await fetchJson(userDirectUrl, controller);
       console.debug("[API DEBUG] jp-api users API response:", userDirectInfo);
     } catch (e) {
@@ -166,19 +143,13 @@ export async function fetchAll(
     }
     
     // followers/followingsは必ず数字IDでアクセス
-    const followersFirst = buildUrl(
-      proxyBase,
-      `https://jp-api.spooncast.net/users/${numericId}/followers/`
-    );
-    const followingsFirst = buildUrl(
-      proxyBase,
-      `https://jp-api.spooncast.net/users/${numericId}/followings/`
-    );
+    const followersFirst = `https://jp-api.spooncast.net/users/${numericId}/followers/`;
+    const followingsFirst = `https://jp-api.spooncast.net/users/${numericId}/followings/`;
     console.debug("[API DEBUG] followers API URL:", followersFirst);
     console.debug("[API DEBUG] followings API URL:", followingsFirst);
     const [followersData, followingsData] = await Promise.all([
-      fetchPaginated(followersFirst, proxyBase, controller),
-      fetchPaginated(followingsFirst, proxyBase, controller),
+      fetchPaginated(followersFirst, controller),
+      fetchPaginated(followingsFirst, controller),
     ]);
     console.debug("[API DEBUG] followers API response:", followersData);
     console.debug("[API DEBUG] followings API response:", followingsData);

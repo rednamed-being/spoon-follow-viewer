@@ -8,6 +8,54 @@ const tabLabels: Record<TabKey, string> = {
   followings: "フォロー中",
 };
 
+// ライブ状態表示用のユーティリティ関数
+function formatLiveStatus(user: any): { text: string, color: string, icon: React.ReactNode } {
+  if (user.current_live && user.current_live.id) {
+    return { 
+      text: "ライブ中", 
+      color: "text-green-600",
+      icon: <span className="inline-block w-3 h-3 bg-green-500 rounded-full mr-1"></span>
+    };
+  } else {
+    return { 
+      text: "オフライン", 
+      color: "text-gray-400",
+      icon: <span className="inline-block w-3 h-3 bg-gray-400 rounded-full mr-1"></span>
+    };
+  }
+}
+
+// 日時フォーマット用のユーティリティ関数
+function formatLastLiveTime(lastLiveAt: string | null): string {
+  if (!lastLiveAt) return "-";
+  
+  try {
+    const date = new Date(lastLiveAt);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      return "今日";
+    } else if (diffDays === 1) {
+      return "昨日";
+    } else if (diffDays < 7) {
+      return `${diffDays}日前`;
+    } else if (diffDays < 30) {
+      const weeks = Math.floor(diffDays / 7);
+      return `${weeks}週間前`;
+    } else if (diffDays < 365) {
+      const months = Math.floor(diffDays / 30);
+      return `${months}ヶ月前`;
+    } else {
+      const years = Math.floor(diffDays / 365);
+      return `${years}年前`;
+    }
+  } catch (e) {
+    return "-";
+  }
+}
+
 function FollowsTable({
   userData,
   followData,
@@ -18,9 +66,17 @@ function FollowsTable({
   const [activeTab, setActiveTab] = useState<TabKey>("mutual");
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<
-    "order" | "nickname" | "follower_count" | "following_count"
+    "order" | "nickname" | "follower_count" | "following_count" | "is_live" | "last_live_at"
   >("order");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  // フォロワータブに切り替えた時に最終ライブ順ソートが選択されていた場合は自動でライブ状態順に変更
+  const handleTabChange = (tab: TabKey) => {
+    setActiveTab(tab);
+    if (tab === "followers" && sortKey === "last_live_at") {
+      setSortKey("is_live");
+    }
+  };
 
   const dataMap: Record<TabKey, SpoonUser[]> = useMemo(
     () => ({
@@ -54,12 +110,32 @@ function FollowsTable({
       } else if (sortKey === "follower_count") {
         av = a.follower_count;
         bv = b.follower_count;
+      } else if (sortKey === "following_count") {
+        av = a.following_count;
+        bv = b.following_count;
+      } else if (sortKey === "is_live") {
+        // ライブ中のユーザーを上位に表示
+        av = (a as any).current_live?.id ? 1 : 0;
+        bv = (b as any).current_live?.id ? 1 : 0;
+      } else if (sortKey === "last_live_at") {
+        // 最終ライブ時間順
+        const aLastLive = (a as any).last_live_at;
+        const bLastLive = (b as any).last_live_at;
+        
+        if (!aLastLive && !bLastLive) return 0;
+        if (!aLastLive) return 1;
+        if (!bLastLive) return -1;
+        
+        const aTime = new Date(aLastLive).getTime();
+        const bTime = new Date(bLastLive).getTime();
+        
+        return sortDir === "asc" ? aTime - bTime : bTime - aTime;
       } else {
         av = a.following_count;
         bv = b.following_count;
       }
-      if (av === undefined) return 1;
-      if (bv === undefined) return -1;
+      if (av === undefined || av === 0) return 1;
+      if (bv === undefined || bv === 0) return -1;
       if (av < bv) return sortDir === "asc" ? -1 : 1;
       if (av > bv) return sortDir === "asc" ? 1 : -1;
       return 0;
@@ -88,7 +164,7 @@ function FollowsTable({
           {(Object.keys(tabLabels) as TabKey[]).map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => handleTabChange(tab)}
               className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
                 activeTab === tab
                   ? "bg-purple-600 text-white shadow"
@@ -121,6 +197,10 @@ function FollowsTable({
                 <option value="nickname">名前順</option>
                 <option value="follower_count">フォロワー数順</option>
                 <option value="following_count">フォロー数順</option>
+                <option value="is_live">ライブ状態順</option>
+                {activeTab !== "followers" && (
+                  <option value="last_live_at">最終ライブ順</option>
+                )}
               </select>
               <button
                 type="button"
@@ -179,13 +259,31 @@ function FollowsTable({
               >
                 フォロー数
               </SortableTh>
+              <SortableTh
+                active={sortKey === "is_live"}
+                dir={sortDir}
+                onClick={() => handleSort("is_live")}
+                className="w-20 min-w-[72px] max-w-[90px] text-left pl-3"
+              >
+                ライブ状態
+              </SortableTh>
+              {activeTab !== "followers" && (
+                <SortableTh
+                  active={sortKey === "last_live_at"}
+                  dir={sortDir}
+                  onClick={() => handleSort("last_live_at")}
+                  className="w-20 min-w-[72px] max-w-[90px] text-left pl-3"
+                >
+                  最終ライブ
+                </SortableTh>
+              )}
               <Th className="w-12 min-w-[40px] max-w-[48px]">種別</Th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center py-10 text-gray-500">
+                <td colSpan={activeTab === "followers" ? 6 : 7} className="text-center py-10 text-gray-500">
                   データがありません
                 </td>
               </tr>
@@ -194,17 +292,29 @@ function FollowsTable({
               <tr key={u.id} className="border-t hover:bg-purple-50/50">
                 <td className="p-1">
                   <a
-                    href={`https://www.spooncast.net/jp/channel/${u.id}/tab/home`}
+                    href={
+                      (u as any).current_live?.id 
+                        ? `https://www.spooncast.net/jp/live/@${u.tag}`
+                        : `https://www.spooncast.net/jp/channel/${u.id}/tab/home`
+                    }
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block hover:opacity-80 transition-opacity"
-                    title="チャンネルページを開く"
+                    title={
+                      (u as any).current_live?.id 
+                        ? "ライブを見る" 
+                        : "チャンネルページを開く"
+                    }
                   >
                     <img
                       src={u.profile_url || getDefaultAvatar()}
                       onError={handleImgError}
                       alt={u.nickname}
-                      className="w-10 h-10 rounded-full object-cover border cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all"
+                      className={`w-10 h-10 rounded-full object-cover border cursor-pointer transition-all ${
+                        (u as any).current_live?.id 
+                          ? "hover:ring-2 hover:ring-red-400 ring-1 ring-red-300" 
+                          : "hover:ring-2 hover:ring-blue-400"
+                      }`}
                     />
                   </a>
                 </td>
@@ -232,6 +342,42 @@ function FollowsTable({
                     ? u.following_count.toLocaleString()
                     : ""}
                 </td>
+                <td className="p-1 pl-3 text-left text-xs">
+                  <div 
+                    className="truncate max-w-[72px]"
+                    title={(u as any).current_live?.id ? `ライブ中 (ID: ${(u as any).current_live.id})` : "オフライン"}
+                  >
+                    {(u as any).current_live?.id ? (
+                      <a
+                        href={`https://www.spooncast.net/jp/live/@${u.tag}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`${formatLiveStatus(u).color} hover:underline cursor-pointer flex items-center`}
+                        title="ライブを見る"
+                      >
+                        {formatLiveStatus(u).icon}
+                        {formatLiveStatus(u).text}
+                      </a>
+                    ) : (
+                      <span className={`${formatLiveStatus(u).color} flex items-center`}>
+                        {formatLiveStatus(u).icon}
+                        {formatLiveStatus(u).text}
+                      </span>
+                    )}
+                  </div>
+                </td>
+                {activeTab !== "followers" && (
+                  <td className="p-1 pl-3 text-left text-xs">
+                    <div 
+                      className="truncate max-w-[72px]"
+                      title={(u as any).last_live_at ? `最終ライブ: ${(u as any).last_live_at}` : "ライブ履歴なし"}
+                    >
+                      <span className="text-gray-600">
+                        {formatLastLiveTime((u as any).last_live_at)}
+                      </span>
+                    </div>
+                  </td>
+                )}
                 <td className="p-1 text-xs text-center">
                   {followData.mutualFollows.some((m) => m.id === u.id) ? (
                     <TypeIcon type="mutual" />

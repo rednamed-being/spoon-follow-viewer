@@ -23,6 +23,16 @@ import FollowsTable from "@/components/FollowsTable";
 import { FollowData, UserData, SpoonUser } from "@/types/spoon";
 import { fetchAll } from "@/lib/apiClient";
 
+// --- 追加: フォロワー/フォロー中データにライブ状態を付与するユーティリティ ---
+function enrichUserWithLiveStatus(user: any): any {
+  // current_live フィールドがあるかチェック
+  return {
+    ...user,
+    is_live: !!(user.current_live && user.current_live.id),
+    last_live_at: user.last_live_created || null, // last_live_created を last_live_at にマッピング
+  };
+}
+
 export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +40,6 @@ export default function App() {
   const [userDetail, setUserDetail] = useState<SpoonUser | null>(null);
   const [channelInfo, setChannelInfo] = useState<ChannelInfo | null>(null);
   const [followData, setFollowData] = useState<FollowData | null>(null);
-  const [proxy, setProxy] = useState<string>("");
   const [initialUserId, setInitialUserId] = useState<string>("");
 
   React.useEffect(() => {
@@ -54,7 +63,7 @@ export default function App() {
         userDirectInfo,
         followersData,
         followingsData,
-      } = await fetchAll(userId, proxy || undefined);
+      } = await fetchAll(userId);
 
       const followerIds = new Set(
         followersData.results?.map((f: any) => f.id) || []
@@ -62,12 +71,24 @@ export default function App() {
       const followingIds = new Set(
         followingsData.results?.map((f: any) => f.id) || []
       );
+
+      // --- 追加: フォロワー/フォロー中データにライブ状態を付与 ---
+      const enrichedFollowers = (followersData.results || []).map((user: any) => 
+        enrichUserWithLiveStatus(user)
+      );
+      
+      const enrichedFollowings = (followingsData.results || []).map((user: any) => 
+        enrichUserWithLiveStatus(user)
+      );
+
+      // 相互フォローは enrichedFollowings（フォロー中）から判定
+      // フォロー中のデータには last_live_created が含まれている
       const mutualFollows =
-        followersData.results?.filter((f: any) => followingIds.has(f.id)) || [];
+        enrichedFollowings.filter((f: any) => followerIds.has(f.id)) || [];
 
       setFollowData({
-        followers: followersData.results || [],
-        followings: followingsData.results || [],
+        followers: enrichedFollowers,
+        followings: enrichedFollowings,
         mutualFollows,
       });
 
@@ -146,6 +167,8 @@ export default function App() {
           is_verified:
             channelUser.isVerified || detailedUserInfo?.is_verified || false,
         };
+        
+        // ライブ状態をチャンネル情報に反映（UserDetailで使用）
       } else if (profilesUser) {
         // channelInfoが取得できない場合はprofilesUserから最低限の情報を使用
         finalUser = {
@@ -243,30 +266,6 @@ export default function App() {
         {/* バージョン表記 */}
         <div className="fixed bottom-2 right-4 bg-white/80 text-xs text-gray-700 px-3 py-1 rounded shadow z-50">
           v{packageJson.version}
-        </div>
-
-        {/* プロキシURL入力欄（Collapse/Accordionで一番下に移動） */}
-        <div className="fixed bottom-0 left-0 w-full flex justify-center pointer-events-none z-40">
-          <div className="w-full max-w-md mx-auto mb-4 pointer-events-auto">
-            <details className="bg-white rounded-xl shadow-lg px-4 py-3">
-              <summary className="cursor-pointer text-sm font-semibold text-gray-700 select-none">
-                オプション: プロキシURL (CORS回避用)
-              </summary>
-              <div className="mt-2 flex flex-col gap-2">
-                <input
-                  id="proxy"
-                  placeholder="例: https://your-proxy.example.com"
-                  value={proxy}
-                  onChange={(e) => setProxy(e.target.value)}
-                  className="px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-                <p className="text-xs text-gray-500">
-                  Spoon API が CORS でブロックされる場合は、任意の
-                  CORS解除プロキシを設定してください。
-                </p>
-              </div>
-            </details>
-          </div>
         </div>
 
         <InputSection
